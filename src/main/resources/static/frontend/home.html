@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Graphura – Social Media Workspace</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .glass {
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.6);
+    }
+    
+  html {
+    scroll-behavior: smooth;
+  }
+  .footer-link {
+    color: #475569;
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+  .footer-link:hover {
+    color: #0891b2;
+  }
+
+  .platform {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid #e5e7eb;
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .platform:hover {
+    border-color: #22d3ee;
+    background: #ecfeff;
+  }
+  
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-[#f8fafc] via-white to-[#f1f5f9] text-slate-800 min-h-screen flex flex-col">
+<main class="flex-grow">
+<!-- ================= NAVBAR ================= -->
+<nav class="sticky top-0 z-50 bg-white border-b border-slate-200/50">
+  <div class="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
+
+    <!-- LOGO -->
+    <div class="flex items-center gap-3">
+      <img src="assets/graphuralogo.png" class="h-14" alt="Graphura Logo">
+    </div>
+
+    <!-- NAV LINKS -->
+    <ul class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
+      <li><a href="#hero" class="hover:text-slate-900 transition">Home</a></li>
+      <li><a href="#stats" class="hover:text-slate-900 transition">Stats</a></li>
+      <li><a href="#features" class="hover:text-slate-900 transition">Features</a></li>
+      <li><a href="#analytics" class="hover:text-slate-900 transition">Analytics</a></li>
+      <li><a href="#cta" class="hover:text-slate-900 transition">Get Started</a></li>
+    </ul>
+
+    <!-- AUTH / USER AREA -->
+    <div class="flex items-center gap-4" id="authButtons">
+
+      <!-- USER NAME (ONLY ONE) -->
+      <span id="userNameDisplay"
+            class="hidden text-sm font-semibold text-slate-700">
+      </span>
+
+      <!-- LOGIN -->
+      <a href="login-signup.html" id="loginBtn"
+   class="inline-flex items-center justify-center
+          px-5 py-2 rounded-full
+          text-sm font-medium
+          text-slate-600
+          border border-slate-300
+          hover:border-slate-900
+          hover:text-slate-900
+          transition-all duration-200">
+  Login
+</a>
+
+      <!-- SIGNUP -->
+      <a href="login-signup.html?mode=signup" id="signupBtn"
+   class="inline-flex items-center justify-center
+          px-5 py-2 rounded-full
+          text-sm font-medium
+          text-white
+          bg-gradient-to-r from-cyan-500 to-blue-600
+          border border-transparent
+          hover:shadow-lg
+          transition-all duration-200">
+  Sign Up
+</a>
+
+
+      <!-- LOGOUT -->
+      <button id="logoutBtn"
+        class="hidden px-6 py-2 rounded-full border border-slate-300 text-slate-600 hover:bg-slate-100 transition"
+        onclick="logout()">
+        Log out
+      </button>
+
+    </div>
+  </div>
+</nav>
+
+
+<!-- ================= HERO ================= -->
+<section id="hero" class="relative overflow-hidden py-40 min-h-[80vh] flex items-center justify-center scroll-mt-24">
+
+  <!-- Background Layers -->
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_#e0f7ff_0%,_#f0f9ff_25%,_#ffffff_50%)]"></div>
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,_#e0fbff_0%,_#f8feff_30%,_transparent_60%)]"></div>
+
+  <!-- Animated Gradient Blobs -->
+  <div class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-cyan-300/20 to-blue-300/10 rounded-full blur-3xl animate-pulse"></div>
+  <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-tr from-indigo-300/15 to-cyan-300/10 rounded-full blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
+
+  <!-- Content -->
+  <div class="relative max-w-5xl mx-auto text-center px-6 z-10">
+
+    <div class="mb-6 inline-block">
+      <span class="text-sm font-bold text-cyan-600 bg-cyan-100/60 px-4 py-2 rounded-full backdrop-blur-sm">
+        ✨ Manage Your Social Presence
+      </span>
+    </div>
+
+    <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight mb-4 leading-tight">
+      Your
+      <span class="bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600">
+        social media workspace
+      </span>
+    </h1>
+
+    <p class="text-lg text-slate-600 max-w-2xl mx-auto mb-8 leading-relaxed">
+      Create, publish, analyze, and grow — all from one beautifully designed dashboard.
+      Streamline your workflow with enterprise-grade tools.
+    </p>
+
+    <!-- CTA BUTTONS -->
+    <div class="flex flex-col sm:flex-row justify-center gap-3">
+
+      <!-- SIGNUP CTA (LOGGED OUT) -->
+      <a href="login-signup.html"
+         id="heroSignupBtn"
+         class="px-10 py-4 rounded-xl text-white font-bold text-lg
+                bg-gradient-to-r from-cyan-400 to-blue-500
+                shadow-lg shadow-cyan-400/30 hover:shadow-xl
+                hover:shadow-cyan-400/40 hover:-translate-y-1
+                transition-all duration-300">
+        Start free
+      </a>
+
+      <!-- DASHBOARD CTA (LOGGED IN) -->
+      <a href="main.html"
+         id="heroDashboardBtn"
+         class="hidden px-10 py-4 rounded-xl text-white font-bold text-lg
+                bg-gradient-to-r from-indigo-500 to-cyan-500
+                shadow-lg shadow-indigo-400/30 hover:shadow-xl
+                hover:-translate-y-1 transition-all duration-300">
+        Go to Dashboard →
+      </a>
+
+    </div>
+
+    <!-- TRUST POINTS -->
+    <div class="mt-10 flex flex-wrap justify-center gap-5 text-sm text-slate-600">
+      <div class="flex items-center gap-2">
+        <span class="text-green-500 text-lg">✓</span>
+        <span>No subscription required</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-green-500 text-lg">✓</span>
+        <span>Connect multiple platforms</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-green-500 text-lg">✓</span>
+        <span>User-friendly interface</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= HERO CTA LOGIC ================= -->
+<script>
+  function updateHeroCTA() {
+    const token = localStorage.getItem('authToken');
+
+    const signupBtn = document.getElementById('heroSignupBtn');
+    const dashboardBtn = document.getElementById('heroDashboardBtn');
+
+    if (token) {
+      signupBtn.classList.add('hidden');
+      dashboardBtn.classList.remove('hidden');
+    } else {
+      signupBtn.classList.remove('hidden');
+      dashboardBtn.classList.add('hidden');
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', updateHeroCTA);
+  
+  // Ensure top and hero Get Access buttons behave correctly when user is logged in
+  document.addEventListener('DOMContentLoaded', function() {
+    const topSignup = document.getElementById('signupBtn');
+    const heroSignup = document.getElementById('heroSignupBtn');
+
+    function handleSignupClick(e) {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        e.preventDefault();
+        window.location.href = 'main.html';
+      }
+      // otherwise allow default (go to login-signup.html)
+    }
+
+    if (topSignup) topSignup.addEventListener('click', handleSignupClick);
+    if (heroSignup) heroSignup.addEventListener('click', handleSignupClick);
+  });
+</script>
+
+
+<!-- ================= STATS SECTION ================= -->
+<section id="stats" class="relative py-14 overflow-hidden scroll-mt-24">
+
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,_#e0fbff_0%,_#f8feff_40%,_#ffffff_70%)]"></div>
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_#f0f9ff_0%,_transparent_50%)]"></div>
+
+  <div class="absolute top-20 right-10 w-64 h-64 bg-gradient-to-bl from-cyan-300/15 to-blue-300/10 rounded-full blur-3xl animate-pulse"></div>
+  <div class="absolute bottom-0 -left-32 w-72 h-72 bg-gradient-to-tr from-indigo-300/10 to-cyan-300/5 rounded-full blur-3xl animate-pulse"></div>
+
+  <div class="max-w-7xl mx-auto px-6 relative z-10">
+    <div class="text-center mb-8">
+      <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-1">
+        Trusted by Industry Leaders
+      </h2>
+      <p class="text-slate-600 text-lg">Millions of users rely on Graphura daily</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="group p-5 rounded-2xl bg-white/70 backdrop-blur-md border hover:shadow-lg transition">
+        <p class="text-sm font-semibold text-slate-500 mb-2">Global Reach</p>
+        <p class="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-600">2.4B+</p>
+        <p class="text-sm font-semibold text-slate-600">Impressions Managed</p>
+      </div>
+
+      <div class="group p-5 rounded-2xl bg-white/70 backdrop-blur-md border hover:shadow-lg transition">
+        <p class="text-sm font-semibold text-slate-500 mb-2">Active Brands</p>
+        <p class="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-indigo-600">15K+</p>
+        <p class="text-sm font-semibold text-slate-600">Trust Us Daily</p>
+      </div>
+
+      <div class="group p-5 rounded-2xl bg-white/70 backdrop-blur-md border hover:shadow-lg transition">
+        <p class="text-sm font-semibold text-slate-500 mb-2">Time Saved</p>
+        <p class="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-cyan-600">18 hrs/wk</p>
+        <p class="text-sm font-semibold text-slate-600">Average Per User</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FEATURES ================= -->
+<section id="features" class="relative py-12 overflow-hidden scroll-mt-24">
+
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_#e0f7ff_0%,_#f0f9ff_30%,_#ffffff_60%)]"></div>
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_#f8feff_0%,_transparent_50%)]"></div>
+
+  <div class="max-w-7xl mx-auto px-6 relative z-10">
+    <div class="text-center mb-10">
+      <h2 class="text-4xl font-extrabold text-slate-900 mb-2">Powerful Features</h2>
+      <p class="text-slate-600 text-lg max-w-2xl mx-auto">
+        Everything you need to manage, publish, and grow
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="glass rounded-3xl p-6 hover:shadow-xl transition">
+        <div class="w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-500 text-white rounded-2xl flex items-center justify-center text-2xl mb-3">📤</div>
+        <h3 class="text-lg font-bold mb-2">Publish Everywhere</h3>
+        <p class="text-slate-600 text-sm">Schedule posts across all major platforms.</p>
+      </div>
+
+      <div class="glass rounded-3xl p-6 hover:shadow-xl transition">
+        <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-indigo-500 text-white rounded-2xl flex items-center justify-center text-2xl mb-3">✏️</div>
+        <h3 class="text-lg font-bold mb-2">Create with Confidence</h3>
+        <p class="text-slate-600 text-sm">Design, edit, and collaborate effortlessly.</p>
+      </div>
+
+      <div class="glass rounded-3xl p-6 hover:shadow-xl transition">
+        <div class="w-12 h-12 bg-gradient-to-br from-indigo-400 to-cyan-500 text-white rounded-2xl flex items-center justify-center text-2xl mb-3">💬</div>
+        <h3 class="text-lg font-bold mb-2">Engage Faster</h3>
+        <p class="text-slate-600 text-sm">Unified inbox for all conversations.</p>
+      </div>
+
+      <div class="glass rounded-3xl p-6 hover:shadow-xl transition">
+        <div class="w-12 h-12 bg-gradient-to-br from-cyan-400 to-blue-500 text-white rounded-2xl flex items-center justify-center text-2xl mb-3">📊</div>
+        <h3 class="text-lg font-bold mb-2">Actionable Analytics</h3>
+        <p class="text-slate-600 text-sm">Insights that drive growth decisions.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ANALYTICS ================= -->
+<section id="analytics" class="relative py-12 overflow-hidden scroll-mt-24">
+
+  <!-- Background -->
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_#e0fbff_0%,_#f8feff_35%,_#ffffff_70%)]"></div>
+
+  <div class="max-w-5xl mx-auto px-6 relative z-10">
+
+    <!-- Header -->
+    <div class="text-center mb-10">
+      <h2 class="text-4xl md:text-5xl font-extrabold text-slate-900 mb-2">
+        Real-time Analytics
+      </h2>
+      <p class="text-slate-600 text-lg max-w-2xl mx-auto">
+        Monitor performance instantly with actionable insights
+      </p>
+    </div>
+
+    <!-- ================= DASHBOARD PREVIEW ================= -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
+
+  <!-- LEFT : DASHBOARD -->
+  <div class="lg:col-span-2 glass rounded-3xl overflow-hidden shadow-2xl">
+
+    <!-- Browser Bar -->
+    <div class="bg-slate-50 px-6 py-3 border-b flex justify-between items-center">
+      <div class="flex gap-2">
+        <span class="w-3 h-3 rounded-full bg-red-400"></span>
+        <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
+        <span class="w-3 h-3 rounded-full bg-green-400"></span>
+      </div>
+      <span class="text-xs font-semibold text-slate-500">
+        dashboard.graphura.io
+      </span>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div class="relative w-full h-[420px] bg-gradient-to-br from-slate-50 to-blue-50/30">
+     <img
+     src="assets/dashboard-analytics-preview.png"
+     alt="Analytics Dashboard Preview"
+     class="absolute inset-0 w-full h-full object-cover"
+     />
+    </div>
+
+  </div>
+
+  <!-- RIGHT : STATS COLUMN -->
+  <div class="flex flex-col gap-4">
+
+    <!-- Engagement -->
+    <div class="glass rounded-2xl p-4 shadow-lg hover:shadow-xl transition">
+      <p class="text-xs font-semibold uppercase text-slate-500 mb-1">
+        Engagement
+      </p>
+      <p
+        class="text-3xl font-extrabold text-cyan-600"
+        data-counter
+        data-start="0"
+        data-end="124"
+        data-suffix="%"
+      >
+        0%
+      </p>
+      <p class="text-xs text-green-600 font-semibold mt-1">
+        ↑ +18% vs last month
+      </p>
+    </div>
+
+    <!-- Followers -->
+    <div class="glass rounded-2xl p-4 shadow-lg hover:shadow-xl transition">
+      <p class="text-xs font-semibold uppercase text-slate-500 mb-1">
+        Followers
+      </p>
+      <p
+        class="text-3xl font-extrabold text-indigo-600"
+        data-counter
+        data-start="0"
+        data-end="12.5"
+        data-suffix="K"
+      >
+        0K
+      </p>
+      <p class="text-xs text-green-600 font-semibold mt-1">
+        ↑ +5.2% growth
+      </p>
+    </div>
+
+    <!-- Response Time -->
+    <div class="glass rounded-2xl p-4 shadow-lg hover:shadow-xl transition">
+      <p class="text-xs font-semibold uppercase text-slate-500 mb-1">
+        Response Time
+      </p>
+      <p
+        class="text-3xl font-extrabold text-cyan-600"
+        data-counter
+        data-start="0"
+        data-end="8.4"
+        data-suffix="m"
+      >
+        0m
+      </p>
+      <p class="text-xs text-green-600 font-semibold mt-1">
+        ↓ 12% faster
+      </p>
+    </div>
+
+  </div>
+
+</div>
+
+
+
+
+<!-- ================= CTA ================= -->
+<section id="cta" class="relative py-12 overflow-hidden scroll-mt-24">
+
+  <!-- Soft Blended Background -->
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(224,247,255,0.6)_0%,_rgba(240,249,255,0.4)_35%,_transparent_70%)]"></div>
+
+  <!-- Decorative Blobs -->
+  <div class="absolute -top-40 left-1/4 w-80 h-80 bg-gradient-to-b from-cyan-400/15 to-transparent rounded-full blur-3xl animate-pulse"></div>
+  <div class="absolute -bottom-40 right-1/4 w-96 h-96 bg-gradient-to-tl from-indigo-400/15 to-transparent rounded-full blur-3xl animate-pulse"></div>
+
+  <div class="max-w-6xl mx-auto px-6 relative z-10">
+    <div class="rounded-3xl p-10 text-center bg-gradient-to-br from-cyan-400/90 via-blue-500/90 to-indigo-600/90 backdrop-blur-sm text-white  border border-white/20">
+      
+      <h2 class="text-4xl md:text-5xl font-extrabold mb-4">
+        Grow your social presence with confidence
+      </h2>
+
+      <p class="text-sm opacity-95 mb-6 max-w-2xl mx-auto">
+        Forever free. No hidden charges, no credit card required.
+      </p>
+
+      <a id="ctaButton"
+         href="login-signup.html"
+         class="inline-flex items-center gap-2 px-7 py-2.5 bg-white text-slate-900 rounded-xl font-bold text-sm hover:scale-105 transition">
+        Get started for free →
+      </a>
+
+    </div>
+  </div>
+</section>
+
+</main>
+<!-- ================= FOOTER ================= -->
+<footer class="w-full bg-white border-t border-slate-200 text-slate-600">
+
+  <div class="max-w-7xl mx-auto px-6 py-14">
+
+    <!-- Main Footer Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+
+      <!-- Brand -->
+      <div class="flex flex-col items-center text-center gap-4">
+        <img src="assets/graphuralogo.png"
+       class="h-16 w-auto"
+       alt="Graphura Logo">
+  
+  <p class="text-sm leading-relaxed max-w-sm text-slate-600">
+    Graphura is a unified social media management platform that helps
+    teams publish, manage, and analyze content from one powerful dashboard.
+  </p>
+
+  
+
+</div>
+
+      <!-- Quick Links -->
+      <div>
+        <h4 class="text-sm font-semibold text-slate-900 uppercase tracking-wide mb-4">
+          Quick Links
+        </h4>
+        <ul class="space-y-3">
+          <li><a href="#hero" class="footer-link">Home</a></li>
+          <li><a href="#features" class="footer-link">Features</a></li>
+          <li><a href="#analytics" class="footer-link">Dashboard</a></li>
+          <li><a href="login-signup.html" class="footer-link">Get Started</a></li>
+        </ul>
+      </div>
+
+      <!-- Product -->
+      <div>
+        <h4 class="text-sm font-semibold text-slate-900 uppercase tracking-wide mb-4">
+          Product
+        </h4>
+        <ul class="space-y-3">
+          <li><a href="#features" class="footer-link">Publish Everywhere</a></li>
+          <li><a href="#features" class="footer-link">Content Creation</a></li>
+          <li><a href="#features" class="footer-link">Engagement Tools</a></li>
+          <li><a href="#analytics" class="footer-link">Analytics & Insights</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact Us -->
+      <div>
+        <h4 class="text-sm font-semibold text-slate-900 uppercase tracking-wide mb-4">
+          Contact Us
+        </h4>
+        <ul class="space-y-3 text-sm">
+          <li>
+            Graphura India Private Limited<br>
+            <span class="text-slate-500">
+              Near RSF, Pataudi, Gurugram,<br>
+              Haryana 122503
+            </span>
+          </li>
+          <li>
+            <a href="tel:+917378021327" class="footer-link">
+              +91 73780 21327
+            </a>
+          </li>
+          <li>
+            <a href="mailto:support@graphura.in" class="footer-link">
+              support@graphura.in
+            </a>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Divider -->
+    <div class="mt-12 border-t border-slate-200/60 pt-6">
+
+      <!-- Bottom Bar -->
+      <div class="flex flex-col md:flex-row items-center justify-center gap-4">
+        <p class="text-xs text-slate-500 text-center">
+          © 2026 Graphura India Private Limited. All rights reserved.
+        </p>
+
+    </div>
+
+  </div>
+</footer>
+
+<!-- Footer Link Utility -->
+<style>
+  .footer-link {
+    @apply text-slate-600 hover:text-slate-900 transition;
+  }
+</style>
+
+
+
+<script>
+  lucide.createIcons();
+    
+  function updateHeroCTA() {
+    const token = localStorage.getItem('authToken');
+
+    const signupBtn = document.getElementById('heroSignupBtn');
+    const dashboardBtn = document.getElementById('heroDashboardBtn');
+
+    if (token) {
+      signupBtn?.classList.add('hidden');
+      dashboardBtn?.classList.remove('hidden');
+    } else {
+      signupBtn?.classList.remove('hidden');
+      dashboardBtn?.classList.add('hidden');
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', updateHeroCTA);
+
+  function checkLoginStatus() {
+    const token = localStorage.getItem('authToken');
+    const userEmail = localStorage.getItem('userEmail');
+    const userName = localStorage.getItem('userName');
+
+    const loginBtn = document.getElementById('loginBtn');
+    const signupBtn = document.getElementById('signupBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const userNameDisplay = document.getElementById('userNameDisplay');
+
+    if (token && userEmail && userName) {
+      // USER IS LOGGED IN
+      loginBtn.classList.add('hidden');
+      signupBtn.classList.add('hidden');
+      logoutBtn.classList.remove('hidden');
+
+      userNameDisplay.textContent = `Hi, ${userName}`;
+      userNameDisplay.classList.remove('hidden');
+      if (token && ctaButton) {
+      ctaButton.textContent = 'Go to dashboard →';
+      ctaButton.href = 'main.html';
+    }
+
+    } else {
+      // USER IS LOGGED OUT
+      loginBtn.classList.remove('hidden');
+      signupBtn.classList.remove('hidden');
+      logoutBtn.classList.add('hidden');
+
+      userNameDisplay.classList.add('hidden');
+      userNameDisplay.textContent = '';
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userName');
+    window.location.href = 'home.html';
+  }
+
+  window.addEventListener('DOMContentLoaded', checkLoginStatus);
+
+  function animateCounter(el) {
+    const start = parseFloat(el.dataset.start);
+    const end = parseFloat(el.dataset.end);
+    const suffix = el.dataset.suffix || "";
+    const duration = 1200;
+
+    let startTime = null;
+
+    function update(timestamp) {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const value = start + (end - start) * progress;
+
+      el.textContent =
+        (end % 1 !== 0 ? value.toFixed(1) : Math.floor(value)) + suffix;
+
+      if (progress < 1) requestAnimationFrame(update);
+    }
+
+    requestAnimationFrame(update);
+  }
+
+  function initCounters() {
+    const counters = document.querySelectorAll("[data-counter]");
+
+    const observer = new IntersectionObserver(
+      (entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            animateCounter(entry.target);
+            obs.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.6 }
+    );
+
+    counters.forEach(counter => observer.observe(counter));
+  }
+
+  window.addEventListener("DOMContentLoaded", initCounters);
+
+
+</script>
+
+
+</body>
+</html>

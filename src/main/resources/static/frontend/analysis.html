@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Graphura – Analytics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js for professional data visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+
+  <style>
+    /* ===== SIDEBAR ===== */
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-weight: 500;
+      color: #475569;
+      transition: all 0.25s ease;
+    }
+
+    .sidebar-link:hover {
+      background: rgba(6,182,212,0.08);
+      color: #0891b2;
+    }
+
+    .sidebar-active {
+      background: rgba(6,182,212,0.15);
+      color: #0891b2;
+      box-shadow: inset 0 0 0 1px rgba(6,182,212,0.25);
+      backdrop-filter: blur(12px);
+    }
+
+    /* ===== MOBILE SIDEBAR ===== */
+    .mobile-menu-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: rgba(6, 182, 212, 0.12);
+      border: 1px solid rgba(6, 182, 212, 0.25);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      flex-direction: column;
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    .mobile-menu-btn:hover {
+      background: rgba(6, 182, 212, 0.2);
+      border-color: rgba(6, 182, 212, 0.4);
+    }
+
+    .mobile-menu-btn span {
+      width: 18px;
+      height: 2px;
+      background: #0891b2;
+      display: block;
+      margin: 2.5px 0;
+      transition: all 0.25s ease;
+      border-radius: 1px;
+    }
+
+    .mobile-sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 30;
+    }
+
+    .mobile-sidebar-overlay.open {
+      background: rgba(0, 0, 0, 0.4);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .mobile-sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100vh;
+      width: 256px;
+      background: white;
+      border-r: 1px solid rgba(6, 182, 212, 0.3);
+      transform: translateX(-100%);
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 40;
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+      overflow-y: auto;
+    }
+
+    .mobile-sidebar.open {
+      transform: translateX(0);
+    }
+
+    @media (min-width: 1024px) {
+      .mobile-menu-btn {
+        display: none !important;
+      }
+      .mobile-sidebar-overlay {
+        display: none !important;
+      }
+      .mobile-sidebar {
+        display: none !important;
+      }
+    }
+
+    /* ===== CHART CONTAINER ===== */
+    .chart-card {
+      background: white/70;
+      backdrop-filter: blur(md);
+      border: 1px solid rgba(6, 182, 212, 0.1);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.08);
+      transition: all 0.3s ease;
+    }
+
+    .chart-card:hover {
+      box-shadow: 0 8px 24px rgba(6, 182, 212, 0.15);
+      border-color: rgba(6, 182, 212, 0.2);
+    }
+
+    /* ===== STAT CARD ===== */
+    .stat-card {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
+      border: 1px solid rgba(6, 182, 212, 0.15);
+      border-radius: 1rem;
+      padding: 1.25rem;
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      border-color: rgba(6, 182, 212, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ===== LOADING ANIMATION ===== */
+    @keyframes pulse-glow {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.7;
+      }
+    }
+
+    .loading-skeleton {
+      animation: pulse-glow 1.5s ease-in-out infinite;
+      background: linear-gradient(90deg, #f0f9ff 0%, #e0f2fe 50%, #f0f9ff 100%);
+      background-size: 200% 100%;
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-slate-50 via-white to-cyan-50/30 text-slate-800 min-h-screen">
+
+<!-- MOBILE SIDEBAR OVERLAY -->
+<div id="mobileSidebarOverlay" class="mobile-sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+<!-- MOBILE SIDEBAR -->
+<aside id="mobileSidebar" class="mobile-sidebar">
+  <!-- LOGO -->
+  <div class="px-6 py-6 border-b flex items-center gap-3">
+    <img src="assets/graphuralogo.png" class="h-10" />
+  </div>
+
+  <!-- NAV -->
+  <nav class="px-4 py-6 space-y-1 flex-1">
+    <a href="main.html" class="sidebar-link" onclick="closeMobileSidebar()">
+      Dashboard
+    </a>
+    <a href="connect.html" class="sidebar-link" onclick="closeMobileSidebar()">
+      Channels
+    </a>
+    <a href="analysis.html" class="sidebar-link sidebar-active" onclick="closeMobileSidebar()">
+      Analytics
+    </a>
+    <a href="help.html" class="sidebar-link" onclick="closeMobileSidebar()">
+      Help & Guide
+    </a>
+  </nav>
+
+  <!-- USER PROFILE -->
+  <div class="p-4 border-t relative">
+    <button id="mobileSidebarProfileBtn"
+      class="w-full flex items-center gap-3 p-3 rounded-xl bg-white shadow-sm hover:shadow transition">
+      <div class="w-9 h-9 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center font-bold">
+        <img src="assets/user_icon.png" class="w-5 h-5" />
+      </div>
+      <div class="truncate text-left">
+        <p id="mobileSidebarUserName" class="text-sm font-semibold">User</p>
+        <p id="mobileSidebarUserEmail" class="text-xs text-gray-500 truncate"></p>
+      </div>
+    </button>
+
+    <!-- DROPDOWN -->
+    <div id="mobileSidebarProfileMenu"
+      class="hidden absolute bottom-20 left-4 right-4 bg-white border rounded-xl shadow-xl overflow-hidden z-50">
+      <button onclick="logout()"
+        class="w-full px-4 py-3 text-left text-red-600 hover:bg-red-50 font-medium">
+        Logout
+      </button>
+    </div>
+  </div>
+</aside>
+
+<!-- ================= APP LAYOUT ================= -->
+<div class="flex min-h-screen">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="hidden lg:flex fixed left-0 top-0 h-screen w-64 bg-gradient-to-b from-white/90 to-cyan-50/50 backdrop-blur-xl border-r border-cyan-200/30 flex flex-col justify-between">
+
+    <!-- LOGO -->
+    <div class="px-6 py-6 border-b flex items-center gap-3">
+      <img src="assets/graphuralogo.png" class="h-16" />
+    </div>
+
+    <!-- NAV -->
+    <nav class="px-4 py-6 space-y-1 flex-1">
+      <a href="main.html" class="sidebar-link">
+        Dashboard
+      </a>
+      <a href="connect.html" class="sidebar-link">
+        Channels
+      </a>
+      <a href="analysis.html" class="sidebar-link sidebar-active">
+        Analytics
+      </a>
+      <a href="help.html" class="sidebar-link">
+       Help & Guide
+      </a>
+    </nav>
+
+    <!-- USER PROFILE -->
+    <div class="p-4 relative">
+      <button id="sidebarProfileBtn"
+        class="mt-auto w-full flex items-center gap-3 px-4 py-3 border-t border-slate-200 hover:bg-slate-50 transition">
+
+        <!-- Avatar -->
+        <div class="w-10 h-10 rounded-full bg-cyan-100 flex items-center justify-center shrink-0">
+          <img src="assets/user_icon.png" class="w-5 h-5" alt="User" />
+        </div>
+
+        <!-- User Info -->
+        <div class="min-w-0 text-left">
+          <p id="sidebarUserName" class="text-sm font-semibold text-slate-800 leading-tight">User</p>
+          <p id="sidebarUserEmail" class="text-xs text-slate-500 leading-tight break-all">user@email.com</p>
+        </div>
+      </button>
+
+      <!-- DROPDOWN -->
+      <div id="sidebarProfileMenu" class="hidden absolute bottom-20 left-4 right-4 bg-white border rounded-xl shadow-xl overflow-hidden z-50">
+        <button onclick="logout()" class="w-full px-4 py-3 text-left text-red-600 hover:bg-red-50 font-medium">
+          Logout
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="lg:ml-64 flex-1 px-4 lg:px-10 py-6 lg:py-10 bg-gradient-to-br from-slate-50 via-white to-cyan-50/40 relative overflow-y-auto overflow-x-hidden w-full">
+    <!-- Background gradient blobs -->
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-cyan-300/15 to-blue-300/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-tr from-indigo-300/10 to-cyan-300/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <!-- ===== DASHBOARD HEADER ===== -->
+    <header class="mb-8 lg:mb-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 relative z-10">
+
+      <!-- TOP ROW: MOBILE BUTTON & TITLE -->
+      <div class="flex items-start gap-3 sm:gap-4">
+        <!-- MOBILE MENU BUTTON -->
+        <button id="mobileMenuBtn" class="mobile-menu-btn lg:hidden flex-shrink-0" onclick="openMobileSidebar()">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <!-- TITLE AND DESCRIPTION -->
+        <div class="flex-1 min-w-0">
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-cyan-600 to-blue-600">
+            Analytics
+          </h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
+            Track performance, posts, and platform insights.
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== STATS CARDS ===== -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 relative z-10">
+      <!-- Total Posts Card -->
+      <div class="stat-card">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-slate-600 text-sm font-medium mb-2">Total Scheduled Posts</p>
+            <p id="totalPostsCount" class="stat-number">0</p>
+          </div>
+          <div class="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-lg">
+            <svg class="w-7 h-7 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Platforms Card -->
+      <div class="stat-card">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-slate-600 text-sm font-medium mb-2">Active Platforms</p>
+            <p id="activePlatformsCount" class="stat-number">0</p>
+          </div>
+          <div class="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg">
+            <svg class="w-7 h-7 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10.5 1.5H5.75A2.25 2.25 0 003.5 3.75v12.5A2.25 2.25 0 005.75 18.5h8.5a2.25 2.25 0 002.25-2.25V9M14 1.5l4.5 4.5M10 7h7.5"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pending Posts Card -->
+      <div class="stat-card">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-slate-600 text-sm font-medium mb-2">Pending Posts</p>
+            <p id="pendingPostsCount" class="stat-number">0</p>
+          </div>
+          <div class="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-orange-100 to-amber-100 rounded-lg">
+            <svg class="w-7 h-7 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v3.5a1 1 0 002 0V6z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CHARTS SECTION ===== -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 relative z-10">
+
+      <!-- CHART 1: SCHEDULED POSTS OVER TIME -->
+      <div class="chart-card">
+        <div class="mb-4">
+          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <svg class="w-6 h-6 text-cyan-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v2H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v2H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
+            Scheduled Posts Over Time
+          </h2>
+          <p class="text-xs text-slate-500 mt-1">Last 30 days activity</p>
+        </div>
+        <div class="relative h-80 w-full">
+          <canvas id="postsTimelineChart"></canvas>
+        </div>
+      </div>
+
+      <!-- CHART 2: POSTS BY PLATFORM -->
+      <div class="chart-card">
+        <div class="mb-4">
+          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <svg class="w-6 h-6 text-cyan-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.25 5.5a.75.75 0 00-.75.75v8.5c0 .414.336.75.75.75h11.5a.75.75 0 00.75-.75v-8.5a.75.75 0 00-.75-.75H4.25zm12-1.5a2.25 2.25 0 012.25 2.25v8.5A2.25 2.25 0 0115.75 17H4.25A2.25 2.25 0 012 14.75v-8.5A2.25 2.25 0 014.25 4h11.5z" clip-rule="evenodd"></path></svg>
+            Posts by Platform
+          </h2>
+          <p class="text-xs text-slate-500 mt-1">Distribution across channels</p>
+        </div>
+        <div class="relative h-80 w-full">
+          <canvas id="platformDistributionChart"></canvas>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ===== LOADING STATE ===== -->
+    <div id="loadingState" class="hidden fixed inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center z-50">
+      <div class="bg-white rounded-2xl p-8 shadow-xl">
+        <div class="animate-spin rounded-full h-12 w-12 border-4 border-cyan-200 border-t-cyan-600 mx-auto mb-4"></div>
+        <p class="text-slate-600 font-medium text-center">Loading analytics...</p>
+      </div>
+    </div>
+
+  </main>
+
+</div>
+
+<!-- ===== SCRIPTS ===== -->
+<script>
+  // ===== AUTHENTICATION CHECK =====
+  window.onload = () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) window.location.href = "home.html";
+
+    const userEmail = localStorage.getItem("userEmail") || "";
+    const userName = localStorage.getItem("userName") || "User";
+
+    // Update desktop sidebar
+    document.getElementById("sidebarUserEmail").textContent = userEmail;
+    document.getElementById("sidebarUserName").textContent = userName;
+
+    // Update mobile sidebar
+    document.getElementById("mobileSidebarUserEmail").textContent = userEmail;
+    document.getElementById("mobileSidebarUserName").textContent = userName;
+
+    // Initialize analytics
+    initializeAnalytics();
+  };
+
+  // ===== LOGOUT FUNCTION =====
+  function logout() {
+    localStorage.clear();
+    window.location.href = "home.html";
+  }
+
+  // ===== MOBILE SIDEBAR FUNCTIONS =====
+  function openMobileSidebar() {
+    const mobileSidebar = document.getElementById('mobileSidebar');
+    const overlay = document.getElementById('mobileSidebarOverlay');
+    mobileSidebar.classList.add('open');
+    overlay.classList.add('open');
+  }
+
+  function closeMobileSidebar() {
+    const mobileSidebar = document.getElementById('mobileSidebar');
+    const overlay = document.getElementById('mobileSidebarOverlay');
+    mobileSidebar.classList.remove('open');
+    overlay.classList.remove('open');
+  }
+
+  // ===== PROFILE DROPDOWN =====
+  document.addEventListener('DOMContentLoaded', function() {
+    // Desktop sidebar profile menu
+    const sidebarProfileBtn = document.getElementById("sidebarProfileBtn");
+    const sidebarProfileMenu = document.getElementById("sidebarProfileMenu");
+
+    if (sidebarProfileBtn && sidebarProfileMenu) {
+      sidebarProfileBtn.addEventListener("click", e => {
+        e.stopPropagation();
+        sidebarProfileMenu.classList.toggle("hidden");
+      });
+
+      document.addEventListener("click", () => {
+        sidebarProfileMenu.classList.add("hidden");
+      });
+    }
+
+    // Mobile sidebar profile menu
+    const mobileSidebarProfileBtn = document.getElementById("mobileSidebarProfileBtn");
+    const mobileSidebarProfileMenu = document.getElementById("mobileSidebarProfileMenu");
+
+    if (mobileSidebarProfileBtn && mobileSidebarProfileMenu) {
+      mobileSidebarProfileBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        mobileSidebarProfileMenu.classList.toggle("hidden");
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest("#mobileSidebarProfileBtn")) {
+          mobileSidebarProfileMenu.classList.add("hidden");
+        }
+      });
+    }
+  });
+
+  // ===== CHART INSTANCES (global scope) =====
+  let postsTimelineChart = null;
+  let platformDistributionChart = null;
+
+  /**
+   * Initialize analytics page with data and charts
+   * Fetches posts from API and renders professional visualizations
+   */
+  async function initializeAnalytics() {
+    try {
+      // Show loading state
+      showLoading(true);
+
+      // Fetch posts from backend API
+      const posts = await fetchPosts();
+
+      if (!posts || posts.length === 0) {
+        // Show 0 values when no posts available
+        updateStatisticsEmpty();
+        renderChartsEmpty();
+      } else {
+        // Process real data
+        updateStatistics(posts);
+        renderChartsWithData(posts);
+      }
+
+    } catch (error) {
+      console.error("Error initializing analytics:", error);
+      // Show 0 values on error
+      updateStatisticsEmpty();
+      renderChartsEmpty();
+    } finally {
+      showLoading(false);
+    }
+  }
+
+  /**
+   * Fetch posts from backend API
+   * @returns {Promise<Array>} Array of post objects
+   */
+  async function fetchPosts() {
+    try {
+      const response = await fetch('http://localhost:8082/api/posts/all', {
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.warn("Could not fetch posts from API, using mock data:", error);
+      return null;
+    }
+  }
+
+  /**
+   * Update statistics cards with real data
+   * @param {Array} posts - Array of post objects
+   */
+  function updateStatistics(posts) {
+    // Total scheduled posts
+    document.getElementById('totalPostsCount').textContent = posts.length;
+
+    // Count unique platforms
+    const uniquePlatforms = new Set(posts.map(p => p.platform));
+    document.getElementById('activePlatformsCount').textContent = uniquePlatforms.size;
+
+    // Count pending posts
+    const pendingPosts = posts.filter(p => p.status === 'PENDING').length;
+    document.getElementById('pendingPostsCount').textContent = pendingPosts;
+  }
+
+  /**
+   * Render charts with real post data
+   * Aggregates data by date and platform
+   * @param {Array} posts - Array of post objects
+   */
+  function renderChartsWithData(posts) {
+    // Data aggregation for timeline chart
+    const timelineData = aggregatePostsByDate(posts);
+    renderTimelineChart(timelineData);
+
+    // Data aggregation for platform distribution chart
+    const platformData = aggregatePostsByPlatform(posts);
+    renderPlatformChart(platformData);
+  }
+
+  /**
+   * Aggregate posts by date for timeline visualization
+   * @param {Array} posts - Array of post objects
+   * @returns {Object} Aggregated data with labels and counts
+   */
+  function aggregatePostsByDate(posts) {
+    const dateMap = {};
+    const today = new Date();
+    const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+    // Initialize all dates in range
+    for (let d = new Date(thirtyDaysAgo); d <= today; d.setDate(d.getDate() + 1)) {
+      const dateStr = d.toISOString().split('T')[0];
+      dateMap[dateStr] = 0;
+    }
+
+    // Count posts per date
+    posts.forEach(post => {
+      const dateStr = new Date(post.scheduledTime).toISOString().split('T')[0];
+      if (dateMap.hasOwnProperty(dateStr)) {
+        dateMap[dateStr]++;
+      }
+    });
+
+    const labels = Object.keys(dateMap).sort();
+    const data = labels.map(label => dateMap[label]);
+
+    return { labels, data };
+  }
+
+  /**
+   * Aggregate posts by platform
+   * @param {Array} posts - Array of post objects
+   * @returns {Object} Aggregated data with platform names and counts
+   */
+  function aggregatePostsByPlatform(posts) {
+    const platformMap = {};
+
+    posts.forEach(post => {
+      const platform = post.platform || 'Unknown';
+      platformMap[platform] = (platformMap[platform] || 0) + 1;
+    });
+
+    const labels = Object.keys(platformMap);
+    const data = Object.values(platformMap);
+
+    return { labels, data };
+  }
+
+  /**
+   * Render timeline chart showing posts over last 30 days
+   * Uses Chart.js for professional visualization
+   * @param {Object} timelineData - Data with labels and values
+   */
+  function renderTimelineChart(timelineData) {
+    const ctx = document.getElementById('postsTimelineChart').getContext('2d');
+
+    // Destroy previous chart instance if exists
+    if (postsTimelineChart) {
+      postsTimelineChart.destroy();
+    }
+
+    // Create gradient fill
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(6, 182, 212, 0.3)');
+    gradient.addColorStop(1, 'rgba(6, 182, 212, 0.01)');
+
+    postsTimelineChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: timelineData.labels.map(date => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
+        datasets: [{
+          label: 'Scheduled Posts',
+          data: timelineData.data,
+          borderColor: '#06b6d4',
+          backgroundColor: gradient,
+          borderWidth: 3,
+          tension: 0.4,
+          fill: true,
+          pointRadius: 5,
+          pointBackgroundColor: '#06b6d4',
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
+          pointHoverRadius: 7,
+          pointHoverBackgroundColor: '#0891b2',
+          segment: {
+            borderDash: (ctx) => ctx.p1DataIndex === undefined ? [] : undefined
+          }
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: {
+              font: { size: 12, weight: '600' },
+              color: '#475569',
+              padding: 15,
+              usePointStyle: true,
+              pointStyle: 'circle'
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+            padding: 12,
+            titleColor: '#f1f5f9',
+            bodyColor: '#e2e8f0',
+            borderColor: 'rgba(6, 182, 212, 0.3)',
+            borderWidth: 1,
+            titleFont: { size: 13, weight: 'bold' },
+            bodyFont: { size: 12 },
+            cornerRadius: 8,
+            displayColors: true,
+            callbacks: {
+              label: function(context) {
+                return `Posts: ${context.parsed.y}`;
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            border: { dash: [5, 5], color: 'rgba(6, 182, 212, 0.1)' },
+            grid: { color: 'rgba(6, 182, 212, 0.08)' },
+            ticks: {
+              font: { size: 12 },
+              color: '#64748b',
+              callback: function(value) {
+                return Math.floor(value);
+              }
+            }
+          },
+          x: {
+            border: { display: false },
+            grid: { display: false },
+            ticks: {
+              font: { size: 12 },
+              color: '#64748b'
+            }
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * Render platform distribution chart
+   * Uses doughnut chart for visual appeal
+   * @param {Object} platformData - Data with platform names and counts
+   */
+  function renderPlatformChart(platformData) {
+    const ctx = document.getElementById('platformDistributionChart').getContext('2d');
+
+    // Destroy previous chart instance if exists
+    if (platformDistributionChart) {
+      platformDistributionChart.destroy();
+    }
+
+    // Color palette for different platforms
+    const platformColors = {
+      'FACEBOOK': '#1877F2',
+      'TWITTER': '#1DA1F2',
+      'LINKEDIN': '#0A66C2',
+      'INSTAGRAM': '#E4405F',
+      'YOUTUBE': '#FF0000',
+      'PINTEREST': '#E60023',
+      'WHATSAPP': '#25D366',
+      'TIKTOK': '#000000'
+    };
+
+    const colors = platformData.labels.map(platform => 
+      platformColors[platform] || '#' + Math.floor(Math.random()*16777215).toString(16)
+    );
+
+    platformDistributionChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: platformData.labels,
+        datasets: [{
+          data: platformData.data,
+          backgroundColor: colors,
+          borderColor: '#ffffff',
+          borderWidth: 3,
+          hoverOffset: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              font: { size: 12, weight: '600' },
+              color: '#475569',
+              padding: 15,
+              usePointStyle: true,
+              pointStyle: 'circle'
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+            padding: 12,
+            titleColor: '#f1f5f9',
+            bodyColor: '#e2e8f0',
+            borderColor: 'rgba(6, 182, 212, 0.3)',
+            borderWidth: 1,
+            titleFont: { size: 13, weight: 'bold' },
+            bodyFont: { size: 12 },
+            cornerRadius: 8,
+            callbacks: {
+              label: function(context) {
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = ((context.parsed / total) * 100).toFixed(1);
+                return `${context.label}: ${context.parsed} (${percentage}%)`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * Update statistics cards with empty/zero values
+   */
+  function updateStatisticsEmpty() {
+    document.getElementById('totalPostsCount').textContent = '0';
+    document.getElementById('activePlatformsCount').textContent = '0';
+    document.getElementById('pendingPostsCount').textContent = '0';
+  }
+
+  /**
+   * Render empty charts with no data
+   */
+  function renderChartsEmpty() {
+    renderTimelineChartEmpty();
+    renderPlatformChartEmpty();
+  }
+
+  /**
+   * Render timeline chart with no data
+   */
+  function renderTimelineChartEmpty() {
+    const ctx = document.getElementById('postsTimelineChart').getContext('2d');
+
+    // Destroy previous chart instance if exists
+    if (postsTimelineChart) {
+      postsTimelineChart.destroy();
+    }
+
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(6, 182, 212, 0.3)');
+    gradient.addColorStop(1, 'rgba(6, 182, 212, 0.01)');
+
+    postsTimelineChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Scheduled Posts',
+          data: [],
+          borderColor: '#06b6d4',
+          backgroundColor: gradient,
+          borderWidth: 3,
+          tension: 0.4,
+          fill: true,
+          pointRadius: 5,
+          pointBackgroundColor: '#06b6d4',
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
+          pointHoverRadius: 7,
+          pointHoverBackgroundColor: '#0891b2'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: {
+              font: { size: 12, weight: '600' },
+              color: '#475569',
+              padding: 15,
+              usePointStyle: true,
+              pointStyle: 'circle'
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+            padding: 12,
+            titleColor: '#f1f5f9',
+            bodyColor: '#e2e8f0',
+            borderColor: 'rgba(6, 182, 212, 0.3)',
+            borderWidth: 1,
+            titleFont: { size: 13, weight: 'bold' },
+            bodyFont: { size: 12 },
+            cornerRadius: 8,
+            displayColors: true,
+            callbacks: {
+              label: function(context) {
+                return `Posts: ${context.parsed.y}`;
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            border: { dash: [5, 5], color: 'rgba(6, 182, 212, 0.1)' },
+            grid: { color: 'rgba(6, 182, 212, 0.08)' },
+            ticks: {
+              font: { size: 12 },
+              color: '#64748b',
+              callback: function(value) {
+                return Math.floor(value);
+              }
+            }
+          },
+          x: {
+            border: { display: false },
+            grid: { display: false },
+            ticks: {
+              font: { size: 12 },
+              color: '#64748b'
+            }
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * Render platform distribution chart with no data
+   */
+  function renderPlatformChartEmpty() {
+    const ctx = document.getElementById('platformDistributionChart').getContext('2d');
+
+    // Destroy previous chart instance if exists
+    if (platformDistributionChart) {
+      platformDistributionChart.destroy();
+    }
+
+    platformDistributionChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: [],
+        datasets: [{
+          data: [],
+          backgroundColor: [],
+          borderColor: '#ffffff',
+          borderWidth: 3,
+          hoverOffset: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              font: { size: 12, weight: '600' },
+              color: '#475569',
+              padding: 15,
+              usePointStyle: true,
+              pointStyle: 'circle'
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+            padding: 12,
+            titleColor: '#f1f5f9',
+            bodyColor: '#e2e8f0',
+            borderColor: 'rgba(6, 182, 212, 0.3)',
+            borderWidth: 1,
+            titleFont: { size: 13, weight: 'bold' },
+            bodyFont: { size: 12 },
+            cornerRadius: 8,
+            callbacks: {
+              label: function(context) {
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+                return `${context.label}: ${context.parsed} (${percentage}%)`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * Render analytics with mock/sample data
+   * Useful for demonstration and testing
+   */
+  function renderAnalyticsWithMockData() {
+    // Mock data structure
+    const mockPosts = [
+      { scheduledTime: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), platform: 'FACEBOOK', status: 'PENDING' },
+      { scheduledTime: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000), platform: 'TWITTER', status: 'PENDING' },
+      { scheduledTime: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), platform: 'LINKEDIN', status: 'PENDING' },
+      { scheduledTime: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), platform: 'FACEBOOK', status: 'PENDING' },
+      { scheduledTime: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), platform: 'YOUTUBE', status: 'PENDING' },
+      { scheduledTime: new Date(), platform: 'PINTEREST', status: 'PENDING' },
+      { scheduledTime: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), platform: 'WHATSAPP', status: 'PENDING' },
+      { scheduledTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), platform: 'FACEBOOK', status: 'PENDING' },
+      { scheduledTime: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), platform: 'TWITTER', status: 'PENDING' },
+      { scheduledTime: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000), platform: 'LINKEDIN', status: 'PENDING' }
+    ];
+
+    updateStatistics(mockPosts);
+    renderChartsWithData(mockPosts);
+  }
+
+  /**
+   * Toggle loading state
+   * @param {Boolean} show - Whether to show loading state
+   */
+  function showLoading(show) {
+    const loadingState = document.getElementById('loadingState');
+    if (show) {
+      loadingState.classList.remove('hidden');
+    } else {
+      loadingState.classList.add('hidden');
+    }
+  }
+</script>
+
+</body>
+</html>

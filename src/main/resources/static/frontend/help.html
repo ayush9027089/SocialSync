@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Graphura – Help & Guide</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* ===== SIDEBAR ===== */
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-weight: 500;
+      color: #475569;
+      transition: all 0.25s ease;
+    }
+
+    .sidebar-link:hover {
+      background: rgba(6,182,212,0.08);
+      color: #0891b2;
+    }
+
+    .sidebar-active {
+      background: rgba(6,182,212,0.15);
+      color: #0891b2;
+      box-shadow: inset 0 0 0 1px rgba(6,182,212,0.25);
+      backdrop-filter: blur(12px);
+    }
+
+    /* ===== MOBILE SIDEBAR ===== */
+    .mobile-menu-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: rgba(6, 182, 212, 0.12);
+      border: 1px solid rgba(6, 182, 212, 0.25);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      flex-direction: column;
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    .mobile-menu-btn:hover {
+      background: rgba(6, 182, 212, 0.2);
+      border-color: rgba(6, 182, 212, 0.4);
+    }
+
+    .mobile-menu-btn span {
+      width: 18px;
+      height: 2px;
+      background: #0891b2;
+      display: block;
+      margin: 2.5px 0;
+      transition: all 0.25s ease;
+      border-radius: 1px;
+    }
+
+    .mobile-sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 30;
+    }
+
+    .mobile-sidebar-overlay.open {
+      background: rgba(0, 0, 0, 0.4);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .mobile-sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100vh;
+      width: 256px;
+      background: white;
+      border-r: 1px solid rgba(6, 182, 212, 0.3);
+      transform: translateX(-100%);
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 40;
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+      overflow-y: auto;
+    }
+
+    .mobile-sidebar.open {
+      transform: translateX(0);
+    }
+
+    @media (min-width: 1024px) {
+      .mobile-menu-btn {
+        display: none !important;
+      }
+      .mobile-sidebar-overlay {
+        display: none !important;
+      }
+      .mobile-sidebar {
+        display: none !important;
+      }
+    }
+
+    /* ===== CARD STYLES ===== */
+    .profile-card {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%);
+      border: 1.5px solid rgba(6, 182, 212, 0.2);
+      border-radius: 1.25rem;
+      padding: 2rem;
+      transition: all 0.3s ease;
+    }
+
+    .profile-card:hover {
+      border-color: rgba(6, 182, 212, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(6, 182, 212, 0.15);
+    }
+
+    .guide-card {
+      background: white/70;
+      backdrop-filter: blur(md);
+      border: 1px solid rgba(6, 182, 212, 0.1);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.08);
+      transition: all 0.3s ease;
+    }
+
+    .guide-card:hover {
+      box-shadow: 0 8px 24px rgba(6, 182, 212, 0.15);
+      border-color: rgba(6, 182, 212, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .step-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+      color: white;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .feature-highlight {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+      border-left: 4px solid #06b6d4;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin: 1rem 0;
+    }
+
+    .tip-box {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+      border-left: 4px solid #22c55e;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin: 1rem 0;
+    }
+
+    .section-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.3), transparent);
+      margin: 2rem 0;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 1rem;
+      border-bottom: 2px solid rgba(6, 182, 212, 0.1);
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .nav-tab {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      background: transparent;
+      color: #64748b;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      border-bottom: 3px solid transparent;
+    }
+
+    .nav-tab:hover {
+      color: #0891b2;
+    }
+
+    .nav-tab.active {
+      color: #0891b2;
+      border-bottom-color: #06b6d4;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-slate-50 via-white to-cyan-50/30 text-slate-800 min-h-screen">
+
+<!-- MOBILE SIDEBAR OVERLAY -->
+<div id="mobileSidebarOverlay" class="mobile-sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+<!-- MOBILE SIDEBAR -->
+<aside id="mobileSidebar" class="mobile-sidebar">
+  <!-- LOGO -->
+  <div class="px-6 py-6 border-b flex items-center gap-3">
+    <img src="assets/graphuralogo.png" class="h-10" />
+  </div>
+
+  <!-- NAV -->
+  <nav class="px-4 py-6 space-y-1 flex-1">
+    <a href="main.html" class="sidebar-link" onclick="closeMobileSidebar()">
+      Dashboard
+    </a>
+    <a href="connect.html" class="sidebar-link" onclick="closeMobileSidebar()">
+      Channels
+    </a>
+    <a href="analysis.html" class="sidebar-link" onclick="closeMobileSidebar()">
+      Analytics
+    </a>
+    <a href="help.html" class="sidebar-link sidebar-active" onclick="closeMobileSidebar()">
+      Help & Guide
+    </a>
+  </nav>
+
+  <!-- USER PROFILE -->
+  <div class="p-4 border-t relative">
+    <button id="mobileSidebarProfileBtn"
+      class="w-full flex items-center gap-3 p-3 rounded-xl bg-white shadow-sm hover:shadow transition">
+      <div class="w-9 h-9 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center font-bold">
+        <img src="assets/user_icon.png" class="w-5 h-5" />
+      </div>
+      <div class="truncate text-left">
+        <p id="mobileSidebarUserName" class="text-sm font-semibold">User</p>
+        <p id="mobileSidebarUserEmail" class="text-xs text-gray-500 truncate"></p>
+      </div>
+    </button>
+
+    <!-- DROPDOWN -->
+    <div id="mobileSidebarProfileMenu"
+      class="hidden absolute bottom-20 left-4 right-4 bg-white border rounded-xl shadow-xl overflow-hidden z-50">
+      <button onclick="logout()"
+        class="w-full px-4 py-3 text-left text-red-600 hover:bg-red-50 font-medium">
+        Logout
+      </button>
+    </div>
+  </div>
+</aside>
+
+<!-- ================= APP LAYOUT ================= -->
+<div class="flex min-h-screen">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="hidden lg:flex fixed left-0 top-0 h-screen w-64 bg-gradient-to-b from-white/90 to-cyan-50/50 backdrop-blur-xl border-r border-cyan-200/30 flex flex-col justify-between">
+
+    <!-- LOGO -->
+    <div class="px-6 py-6 border-b flex items-center gap-3">
+      <img src="assets/graphuralogo.png" class="h-16" />
+    </div>
+
+    <!-- NAV -->
+    <nav class="px-4 py-6 space-y-1 flex-1">
+      <a href="main.html" class="sidebar-link">
+        Dashboard
+      </a>
+      <a href="connect.html" class="sidebar-link">
+        Channels
+      </a>
+      <a href="analysis.html" class="sidebar-link">
+        Analytics
+      </a>
+      <a href="help.html" class="sidebar-link sidebar-active">
+        Help & Guide
+      </a>
+    </nav>
+
+    <!-- USER PROFILE -->
+    <div class="p-4 relative">
+      <button id="sidebarProfileBtn"
+        class="mt-auto w-full flex items-center gap-3 px-4 py-3 border-t border-slate-200 hover:bg-slate-50 transition">
+
+        <!-- Avatar -->
+        <div class="w-10 h-10 rounded-full bg-cyan-100 flex items-center justify-center shrink-0">
+          <img src="assets/user_icon.png" class="w-5 h-5" alt="User" />
+        </div>
+
+        <!-- User Info -->
+        <div class="min-w-0 text-left">
+          <p id="sidebarUserName" class="text-sm font-semibold text-slate-800 leading-tight">User</p>
+          <p id="sidebarUserEmail" class="text-xs text-slate-500 leading-tight break-all">user@email.com</p>
+        </div>
+      </button>
+
+      <!-- DROPDOWN -->
+      <div id="sidebarProfileMenu" class="hidden absolute bottom-20 left-4 right-4 bg-white border rounded-xl shadow-xl overflow-hidden z-50">
+        <button onclick="logout()" class="w-full px-4 py-3 text-left text-red-600 hover:bg-red-50 font-medium">
+          Logout
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="lg:ml-64 flex-1 px-4 lg:px-10 py-4 lg:py-8 bg-gradient-to-br from-slate-50 via-white to-cyan-50/40 relative overflow-y-auto overflow-x-hidden max-h-screen w-full">
+    <!-- Background gradient blobs -->
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-cyan-300/15 to-blue-300/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-tr from-indigo-300/10 to-cyan-300/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <!-- ===== DASHBOARD HEADER ===== -->
+    <header class="mb-8 lg:mb-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 relative z-10">
+
+      <!-- TOP ROW: MOBILE BUTTON & TITLE -->
+      <div class="flex items-start gap-3 sm:gap-4">
+        <!-- MOBILE MENU BUTTON -->
+        <button id="mobileMenuBtn" class="mobile-menu-btn lg:hidden flex-shrink-0" onclick="openMobileSidebar()">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <!-- TITLE AND DESCRIPTION -->
+        <div class="flex-1 min-w-0">
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-cyan-600 to-blue-600">
+            Help & Guide
+          </h1>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
+            Learn how to use Graphura and master your social media scheduling.
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== USER PROFILE SECTION ===== -->
+    <section class="mb-8 relative z-10">
+      <div class="profile-card">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-6">
+          <!-- Avatar -->
+          <div class="flex-shrink-0">
+            <div class="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-4xl border-4 border-white shadow-lg">
+              <img src="assets/user_icon.png" class="w-12 h-12" alt="User" />
+            </div>
+          </div>
+
+          <!-- User Info -->
+          <div class="flex-1">
+            <h2 class="text-2xl font-bold text-slate-900 mb-1">Welcome, <span id="displayUserName">User</span>!</h2>
+            <div class="space-y-2">
+              <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-cyan-600" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path></svg>
+                <p class="text-slate-600 font-medium">Email: <span id="displayUserEmail" class="text-cyan-600 font-semibold">user@email.com</span></p>
+              </div>
+              <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-cyan-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                <p class="text-slate-600 font-medium">Status: <span class="text-green-600 font-semibold">✓ Active</span></p>
+              </div>
+              <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-cyan-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
+                <p class="text-slate-600 font-medium">Authentication: <span class="text-green-600 font-semibold">Verified</span></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Button -->
+          <div class="flex-shrink-0">
+            <button onclick="logout()" class="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all active:scale-95 flex items-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== NAVIGATION TABS ===== -->
+    <section class="mb-8 relative z-10">
+      <div class="nav-tabs">
+        <button class="nav-tab active" onclick="switchTab(event, 'website-guide')" style="display: flex; align-items: center; gap: 0.5rem;">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.25 5.5a.75.75 0 00-.75.75v8.5c0 .414.336.75.75.75h11.5a.75.75 0 00.75-.75v-8.5a.75.75 0 00-.75-.75H4.25zm12-1.5a2.25 2.25 0 012.25 2.25v8.5A2.25 2.25 0 0115.75 17H4.25A2.25 2.25 0 012 14.75v-8.5A2.25 2.25 0 014.25 4h11.5zM5.5 9a1 1 0 100-2 1 1 0 000 2zm5.5 2.5a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path></svg>
+          Website Guide
+        </button>
+        <button class="nav-tab" onclick="switchTab(event, 'calendar-guide')" style="display: flex; align-items: center; gap: 0.5rem;">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v2H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v2H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
+          Calendar Guide
+        </button>
+        <button class="nav-tab" onclick="switchTab(event, 'tips')" style="display: flex; align-items: center; gap: 0.5rem;">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM15.657 14.243a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM11 17v-1a1 1 0 10-2 0v1a1 1 0 102 0zM4.343 14.243a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM2 10a1 1 0 011-1h1a1 1 0 110 2H3a1 1 0 01-1-1zM4.343 5.757a1 1 0 000 1.414l.707.707a1 1 0 001.414-1.414l-.707-.707z"></path></svg>
+          Tips & Tricks
+        </button>
+      </div>
+    </section>
+
+    <!-- ===== WEBSITE GUIDE TAB ===== -->
+    <section id="website-guide" class="tab-content active relative z-10">
+      <div class="space-y-6">
+
+        <!-- Overview Card -->
+        <div class="guide-card">
+          <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <svg class="w-7 h-7 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5.951-1.429 5.951 1.429a1 1 0 001.169-1.409l-7-14z"></path></svg>
+            Getting Started with Graphura
+          </h3>
+          <p class="text-slate-600 leading-relaxed mb-4">
+            Graphura is a powerful social media scheduling platform that helps you manage posts across multiple platforms from a single, intuitive dashboard. Whether you're scheduling individual posts or planning your entire content calendar, Graphura makes it simple and efficient.
+          </p>
+          <div class="feature-highlight">
+            <p class="font-semibold text-slate-800 flex items-center gap-2"><svg class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg> Key Features:</p>
+            <ul class="mt-2 space-y-2 text-slate-700">
+              <li>✓ Schedule posts across multiple platforms</li>
+              <li>✓ Visualize your content calendar</li>
+              <li>✓ Track post analytics and performance</li>
+              <li>✓ Manage multiple social media channels</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Dashboard Overview -->
+        <div class="guide-card">
+          <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <svg class="w-7 h-7 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path></svg>
+            Understanding the Dashboard
+          </h3>
+          <div class="space-y-4">
+
+            <div class="flex gap-4">
+              <div class="step-badge">1</div>
+              <div>
+                <h4 class="font-bold text-slate-800">Navigation Sidebar</h4>
+                <p class="text-slate-600 mt-1">The left sidebar contains links to all main sections: Dashboard, Channels, Analytics, and Help. Your profile menu is at the bottom with logout option.</p>
+              </div>
+            </div>
+
+            <div class="flex gap-4">
+              <div class="step-badge">2</div>
+              <div>
+                <h4 class="font-bold text-slate-800">Schedule New Posts</h4>
+                <p class="text-slate-600 mt-1">Click the "Schedule Post" button in the top right. Fill in your post content, select media, choose platform, and pick your scheduled time. Posts can be scheduled across any connected platform.</p>
+              </div>
+            </div>
+
+            <div class="flex gap-4">
+              <div class="step-badge">3</div>
+              <div>
+                <h4 class="font-bold text-slate-800">View Your Posts</h4>
+                <p class="text-slate-600 mt-1">Switch between "Scheduled Posts" and "Completed Posts" tabs on the Dashboard to see upcoming and past posts. Click "View Details" on any card to see full information.</p>
+              </div>
+            </div>
+
+            <div class="flex gap-4">
+              <div class="step-badge">4</div>
+              <div>
+                <h4 class="font-bold text-slate-800">Manage Channels</h4>
+                <p class="text-slate-600 mt-1">Go to "Channels" to connect your social media accounts. Click on a channel and follow the OAuth authentication process to connect your account. Each platform appears in a colored card with its status.</p>
+              </div>
+            </div>
+
+            <div class="flex gap-4">
+              <div class="step-badge">5</div>
+              <div>
+                <h4 class="font-bold text-slate-800">View Analytics</h4>
+                <p class="text-slate-600 mt-1">The "Analytics" page shows you detailed insights with professional charts displaying post trends over time and distribution across platforms. Statistics cards show total posts, active platforms, and pending posts.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Platform Support -->
+        <div class="guide-card">
+          <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <svg class="w-7 h-7 text-cyan-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 00-1-1 9 9 0 00-9 9 1 1 0 001 1h1a1 1 0 100-2h-.5A8 8 0 0013 5.5V3a1 1 0 00-1-1H6a1 1 0 00-1 1h2a1 1 0 01 0 2H3zm10 8a1 1 0 00-1-1h-1a1 1 0 100 2h.5A8 8 0 007 14.5V17a1 1 0 001 1h7a1 1 0 001-1h-2a1 1 0 110-2h2z" clip-rule="evenodd"></path></svg>
+            Supported Platforms
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+              <img src="assets/facebook.png" alt="Facebook" class="w-8 h-8" />
+              <span class="font-semibold text-slate-700">Facebook</span>
+            </div>
+            <div class="flex items-center gap-3 p-3 bg-blue-100 rounded-lg">
+              <img src="assets/twitter.png" alt="Twitter" class="w-8 h-8" />
+              <span class="font-semibold text-slate-700">Twitter/X</span>
+            </div>
+            <div class="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+              <img src="assets/linkedin.png" alt="LinkedIn" class="w-8 h-8" />
+              <span class="font-semibold text-slate-700">LinkedIn</span>
+            </div>
+            <div class="flex items-center gap-3 p-3 bg-red-50 rounded-lg">
+              <img src="assets/youtube.png" alt="YouTube" class="w-8 h-8" />
+              <span class="font-semibold text-slate-700">YouTube</span>
+            </div>
+            <div class="flex items-center gap-3 p-3 bg-red-100 rounded-lg">
+              <img src="assets/pintrest.png" alt="Pinterest" class="w-8 h-8" />
+              <span class="font-semibold text-slate-700">Pinterest</span>
+            </div>
+            <div class="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
+              <img src="assets/whatsapp.png" alt="WhatsApp" class="w-8 h-8" />
+              <span class="font-semibold text-slate-700">WhatsApp</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Best Practices -->
+        <div class="guide-card">
+          <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <svg class="w-7 h-7 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+            Best Practices
+          </h3>
+          <div class="space-y-3">
+            <div class="tip-box">
+              <p><strong>📝 Plan Ahead:</strong> Schedule posts several days or weeks in advance. This helps you maintain consistency and stay organized.</p>
+            </div>
+            <div class="tip-box">
+              <p><strong>🎯 Know Your Audience:</strong> Schedule posts at times when your audience is most active on each platform.</p>
+            </div>
+            <div class="tip-box">
+              <p><strong>📸 Use Media:</strong> Posts with images or videos get better engagement. Always add relevant media when possible.</p>
+            </div>
+            <div class="tip-box">
+              <p><strong>✅ Check Before Scheduling:</strong> Review post content and preview before scheduling to avoid typos or errors.</p>
+            </div>
+            <div class="tip-box">
+              <p><strong>📊 Track Performance:</strong> Regularly check Analytics to understand what content performs best on each platform.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== CALENDAR GUIDE TAB ===== -->
+    <section id="calendar-guide" class="tab-content relative z-10">
+      <div class="space-y-6">
+
+        <!-- Overview -->
+        <div class="guide-card">
+          <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <svg class="w-7 h-7 text-cyan-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v2H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v2H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path></svg>
+            Using the Calendar View
+          </h3>
+          <p class="text-slate-600 leading-relaxed mb-4">
+            The calendar view gives you a monthly overview of all your scheduled posts. This visual representation helps you see your content distribution across dates and plan your posting schedule more effectively.
+          </p>
+          <div class="feature-highlight">
+            <p class="font-semibold text-slate-800 flex items-center gap-2"><svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path d="M5.5 13a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.3A4.5 4.5 0 1113.5 13H11V9.413l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13H5.5z"></path></svg> Calendar Features:</p>
+            <ul class="mt-2 space-y-2 text-slate-700">
+              <li>✓ Month-based view of all scheduled posts</li>
+              <li>✓ Color-coded posts by platform</li>
+              <li>✓ Quick post count display per day</li>
+              <li>✓ Click dates to see detailed post information</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Calendar Features -->
+        <div class="guide-card">
+          <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <svg class="w-7 h-7 text-purple-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+            How to Use Calendar Features
+          </h3>
+          <div class="space-y-4">
+
+            <div class="flex gap-4">
+              <div class="step-badge">1</div>
+              <div>
+                <h4 class="font-bold text-slate-800">View Calendar</h4>
+                <p class="text-slate-600 mt-1">On the Dashboard, click the "📅 Calendar" button in the top right to switch from List view to Calendar view. Your posts will display on their scheduled dates.</p>
+              </div>
+            </div>
+
+            <div class="flex gap-4">
+              <div class="step-badge">2</div>
+              <div>
+                <h4 class="font-bold text-slate-800">Read Post Indicators</h4>
+                <p class="text-slate-600 mt-1">Each day shows the number of posts scheduled. Days with posts have colored indicators. Empty days have no indicators. Colors may vary by platform.</p>
+              </div>
+            </div>
+            <div class="flex gap-4">
+              <div class="step-badge">3</div>
+              <div>
+                <h4 class="font-bold text-slate-800">Navigate Months</h4>
+                <p class="text-slate-600 mt-1">Use the navigation arrows to move between months. The calendar automatically updates to show posts for the selected month.</p>
+              </div>
+            </div>
+
+            <div class="flex gap-4">
+              <div class="step-badge">4</div>
+              <div>
+                <h4 class="font-bold text-slate-800">Return to List</h4>
+                <p class="text-slate-600 mt-1">Click the "📋 List" button to go back to the list view with the Scheduled/Completed tabs. Both views show the same data, just organized differently.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Calendar Tips -->
+        <div class="guide-card">
+          <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <svg class="w-7 h-7 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM15.657 14.243a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM11 17v-1a1 1 0 10-2 0v1a1 1 0 102 0zM4.343 14.243a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM2 10a1 1 0 011-1h1a1 1 0 110 2H3a1 1 0 01-1-1zM4.343 5.757a1 1 0 000 1.414l.707.707a1 1 0 001.414-1.414l-.707-.707z"></path></svg>
+            Calendar Tips
+          </h3>
+          <div class="space-y-3">
+            <div class="tip-box">
+              <p><strong>🗓️ Monthly Planning:</strong> Use calendar view to see your entire month's content at a glance and identify gaps in your posting schedule.</p>
+            </div>
+            <div class="tip-box">
+              <p><strong>📊 Balance Distribution:</strong> Ensure posts are evenly distributed throughout the month rather than bunched on specific days.</p>
+            </div>
+            <div class="tip-box">
+              <p><strong>🔄 Recurring Posts:</strong> Plan recurring content (e.g., Monday tips, Friday updates) with consistent spacing in the calendar.</p>
+            </div>
+            <div class="tip-box">
+              <p><strong>⏰ Time Zones:</strong> Remember that times are based on your selected timezone. Verify scheduled times match your intended audience's timezone.</p>
+            </div>
+            <div class="tip-box">
+              <p><strong>📱 Mobile View:</strong> Calendar is fully responsive. View and manage posts on mobile devices with the same functionality as desktop.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visual Guide -->
+        <div class="guide-card">
+          <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <svg class="w-7 h-7 text-pink-500" fill="currentColor" viewBox="0 0 20 20"><path d="M11 15a1 1 0 11-2 0 1 1 0 012 0zM8 9a1 1 0 11-2 0 1 1 0 012 0zM14 9a1 1 0 11-2 0 1 1 0 012 0zM15 12a1 1 0 100-2 1 1 0 000 2z"></path></svg>
+            Understanding Calendar Visual Elements
+          </h3>
+          <div class="space-y-4">
+            <div class="flex gap-4 p-3 bg-slate-50 rounded-lg">
+              <span class="text-2xl">📅</span>
+              <div>
+                <p class="font-semibold text-slate-800">Date Numbers</p>
+                <p class="text-slate-600 text-sm">Large numbers show dates. Some dates may have small post count indicators.</p>
+              </div>
+            </div>
+            <div class="flex gap-4 p-3 bg-slate-50 rounded-lg">
+              <span class="text-2xl">🔵</span>
+              <div>
+                <p class="font-semibold text-slate-800">Post Indicators</p>
+                <p class="text-slate-600 text-sm">Colored dots or badges show when posts are scheduled.</p>
+              </div>
+            </div>
+            <div class="flex gap-4 p-3 bg-slate-50 rounded-lg">
+              <span class="text-2xl">⬅️➡️</span>
+              <div>
+                <p class="font-semibold text-slate-800">Navigation Arrows</p>
+                <p class="text-slate-600 text-sm">Use arrows at top of calendar to move to previous/next months.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== TIPS & TRICKS TAB ===== -->
+    <section id="tips" class="tab-content relative z-10">
+      <div class="space-y-6">
+
+        <!-- General Tips -->
+        <div class="guide-card">
+          <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <svg class="w-7 h-7 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h6a1 1 0 01.82 1.573l-7 10A1 1 0 018 17v-5H2a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.46z" clip-rule="evenodd"></path></svg>
+            Quick Tips for Maximum Productivity
+          </h3>
+          <div class="space-y-3">
+            <div class="tip-box">
+              <p><strong>🚀 Batch Create:</strong> Schedule multiple posts at once in a single session. This is more efficient than scheduling one post at a time.</p>
+            </div>
+            <div class="tip-box">
+              <p><strong>🎯 Platform Specific:</strong> Customize content for each platform. What works on LinkedIn may not work on TikTok. Tailor your message.</p>
+            </div>
+            <div class="tip-box">
+              <p><strong>⏱️ Optimal Times:</strong> Post when your audience is most active. Morning (7-9 AM) and evening (7-9 PM) are usually best for most platforms.</p>
+            </div>
+            <div class="tip-box">
+              <p><strong>📝 Content Calendar:</strong> Keep a separate document with your content ideas. This helps you plan posts faster in Graphura.</p>
+            </div>
+            <div class="tip-box">
+              <p><strong>🔗 Use Links Wisely:</strong> Include links to drive traffic, but don't overuse them. Balance promotional and organic content (80/20 rule).</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Troubleshooting -->
+        <div class="guide-card">
+          <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <svg class="w-7 h-7 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h6a1 1 0 01.82 1.573l-7 10A1 1 0 018 17v-5H2a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.46z" clip-rule="evenodd"></path></svg>
+            Troubleshooting Common Issues
+          </h3>
+          <div class="space-y-4">
+
+            <div class="border-l-4 border-yellow-500 pl-4 py-2">
+              <h4 class="font-bold text-slate-800">Post Not Appearing After Scheduled Time?</h4>
+              <p class="text-slate-600 text-sm mt-1">✓ Check your internet connection<br/>✓ Verify channel is connected (go to Channels page)<br/>✓ Check post status in Completed Posts tab<br/>✓ If still missing, try scheduling a new test post</p>
+            </div>
+
+            <div class="border-l-4 border-yellow-500 pl-4 py-2">
+              <h4 class="font-bold text-slate-800">Channel Connection Failed?</h4>
+              <p class="text-slate-600 text-sm mt-1">✓ Check your credentials are correct<br/>✓ Ensure account access is granted<br/>✓ Try disconnecting and reconnecting<br/>✓ Check if platform has 2FA enabled</p>
+            </div>
+
+            <div class="border-l-4 border-yellow-500 pl-4 py-2">
+              <h4 class="font-bold text-slate-800">Analytics Not Showing Data?</h4>
+              <p class="text-slate-600 text-sm mt-1">✓ Create some posts first (need data to display)<br/>✓ Wait for scheduled posts to publish<br/>✓ Check if backend API is running<br/>✓ Refresh the page if data seems stale</p>
+            </div>
+
+            <div class="border-l-4 border-yellow-500 pl-4 py-2">
+              <h4 class="font-bold text-slate-800">Can't See Uploaded Media?</h4>
+              <p class="text-slate-600 text-sm mt-1">✓ Ensure file format is supported (JPG, PNG, MP4)<br/>✓ Check file size is under limit<br/>✓ Try uploading a different image<br/>✓ Clear browser cache and refresh</p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Advanced Features -->
+        <div class="guide-card">
+          <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <svg class="w-7 h-7 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10.5 1.5H5.75A2.25 2.25 0 003.5 3.75v12.5A2.25 2.25 0 005.75 18.5h8.5a2.25 2.25 0 002.25-2.25V9M14 1.5l4.5 4.5M10 7h7.5"></path></svg>
+            Advanced Features & Techniques
+          </h3>
+          <div class="space-y-3">
+            <div class="feature-highlight">
+              <p><strong>🎯 Hashtag Strategy:</strong> Use 5-10 relevant hashtags on platforms like Twitter, Instagram, LinkedIn. Research trending hashtags in your niche for better reach.</p>
+            </div>
+            <div class="feature-highlight">
+              <p><strong>🤝 Cross-Platform Posting:</strong> Schedule the same post to multiple platforms but customize captions for each platform's audience and style.</p>
+            </div>
+            <div class="feature-highlight">
+              <p><strong>📊 A/B Testing:</strong> Schedule similar posts at different times to see which performs better. Use Analytics to track results.</p>
+            </div>
+            <div class="feature-highlight">
+              <p><strong>💬 Call-to-Actions:</strong> Include clear CTAs in posts (e.g., "Like & Share", "Comment Your Thoughts", "Click Link"). This increases engagement.</p>
+            </div>
+            <div class="feature-highlight">
+              <p><strong>🔄 Content Repurposing:</strong> Reuse successful posts in different formats or at different times to maximize ROI on your content creation.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+</div>
+
+<!-- ===== SCRIPTS ===== -->
+<script>
+  // ===== AUTHENTICATION CHECK =====
+  window.onload = () => {
+    const token = localStorage.getItem("authToken");
+    if (!token) window.location.href = "home.html";
+
+    const userEmail = localStorage.getItem("userEmail") || "";
+    const userName = localStorage.getItem("userName") || "User";
+
+    // Update desktop sidebar
+    document.getElementById("sidebarUserEmail").textContent = userEmail;
+    document.getElementById("sidebarUserName").textContent = userName;
+
+    // Update mobile sidebar
+    document.getElementById("mobileSidebarUserEmail").textContent = userEmail;
+    document.getElementById("mobileSidebarUserName").textContent = userName;
+
+    // Update profile section
+    document.getElementById("displayUserName").textContent = userName;
+    document.getElementById("displayUserEmail").textContent = userEmail;
+  };
+
+  // ===== LOGOUT FUNCTION =====
+  function logout() {
+    localStorage.clear();
+    window.location.href = "home.html";
+  }
+
+  // ===== MOBILE SIDEBAR FUNCTIONS =====
+  function openMobileSidebar() {
+    const mobileSidebar = document.getElementById('mobileSidebar');
+    const overlay = document.getElementById('mobileSidebarOverlay');
+    mobileSidebar.classList.add('open');
+    overlay.classList.add('open');
+  }
+
+  function closeMobileSidebar() {
+    const mobileSidebar = document.getElementById('mobileSidebar');
+    const overlay = document.getElementById('mobileSidebarOverlay');
+    mobileSidebar.classList.remove('open');
+    overlay.classList.remove('open');
+  }
+
+  // ===== PROFILE DROPDOWN =====
+  document.addEventListener('DOMContentLoaded', function() {
+    // Desktop sidebar profile menu
+    const sidebarProfileBtn = document.getElementById("sidebarProfileBtn");
+    const sidebarProfileMenu = document.getElementById("sidebarProfileMenu");
+
+    if (sidebarProfileBtn && sidebarProfileMenu) {
+      sidebarProfileBtn.addEventListener("click", e => {
+        e.stopPropagation();
+        sidebarProfileMenu.classList.toggle("hidden");
+      });
+
+      document.addEventListener("click", () => {
+        sidebarProfileMenu.classList.add("hidden");
+      });
+    }
+
+    // Mobile sidebar profile menu
+    const mobileSidebarProfileBtn = document.getElementById("mobileSidebarProfileBtn");
+    const mobileSidebarProfileMenu = document.getElementById("mobileSidebarProfileMenu");
+
+    if (mobileSidebarProfileBtn && mobileSidebarProfileMenu) {
+      mobileSidebarProfileBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        mobileSidebarProfileMenu.classList.toggle("hidden");
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest("#mobileSidebarProfileBtn")) {
+          mobileSidebarProfileMenu.classList.add("hidden");
+        }
+      });
+    }
+  });
+
+  /**
+   * Switch between guide tabs
+   * @param {Event} event - Click event
+   * @param {string} tabId - ID of tab to show
+   */
+  function switchTab(event, tabId) {
+    event.preventDefault();
+
+    // Hide all tabs
+    const allTabs = document.querySelectorAll('.tab-content');
+    allTabs.forEach(tab => tab.classList.remove('active'));
+
+    // Remove active class from all buttons
+    const allButtons = document.querySelectorAll('.nav-tab');
+    allButtons.forEach(btn => btn.classList.remove('active'));
+
+    // Show selected tab and activate button
+    document.getElementById(tabId).classList.add('active');
+    event.target.classList.add('active');
+  }
+</script>
+
+</body>
+</html>

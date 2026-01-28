@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Graphura | Login & Signup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    html { scroll-behavior: smooth; }
+    
+    .glass {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+    }
+    
+    .glass-dark {
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(6, 182, 212, 0.2);
+    }
+    
+    .gradient-text {
+      background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .animated-gradient {
+      background: linear-gradient(-45deg, #06b6d4, #3b82f6, #0891b2, #3b82f6);
+      background-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+    }
+    
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    .form-slide {
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .form-enter {
+      animation: slideIn 0.6s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* Enhanced Input Styling */
+    .form-input {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    }
+
+    .form-input:hover {
+      border-color: #cbd5e1;
+      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.08);
+    }
+
+    .form-input:focus {
+      background: #ffffff;
+      border-color: #06b6d4;
+      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1), 0 4px 20px rgba(6, 182, 212, 0.12);
+    }
+
+    /* Input Label Animation */
+    .form-group {
+      position: relative;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.625rem;
+      color: #475569;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    /* Button Styling */
+    .btn-gradient {
+      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 50%, #3b82f6 100%);
+      background-size: 200% 200%;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-gradient:hover {
+      background-position: 200% 0;
+      box-shadow: 0 12px 24px rgba(6, 182, 212, 0.3), 0 8px 16px rgba(59, 130, 246, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .btn-gradient:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.2);
+    }
+
+    .btn-gradient::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn-gradient:hover::before {
+      left: 100%;
+    }
+
+    /* Form Card Shadow & Border */
+    .form-card {
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18), 0 0 1px rgba(6, 182, 212, 0.2), 0 10px 20px rgba(0, 0, 0, 0.12);
+      border: 1.5px solid rgba(6, 182, 212, 0.15);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .form-card:hover {
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.22), 0 0 1px rgba(6, 182, 212, 0.3), 0 15px 30px rgba(0, 0, 0, 0.16);
+      border-color: rgba(6, 182, 212, 0.25);
+    }
+
+    /* Error Message Animation */
+    .error-message {
+      animation: slideInError 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideInError {
+      from {
+        opacity: 0;
+        transform: translateY(-4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Success Indicator */
+    .success-checkmark {
+      animation: checkmark 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes checkmark {
+      0% {
+        transform: scale(0) rotate(-45deg);
+        opacity: 0;
+      }
+      50% {
+        transform: scale(1.2);
+      }
+      100% {
+        transform: scale(1) rotate(0);
+        opacity: 1;
+      }
+    }
+
+    /* Floating Label Effect */
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      font-size: 0.875rem;
+      transition: all 0.3s ease;
+    }
+
+    .form-input:focus ~ .input-icon {
+      color: #06b6d4;
+    }
+
+    .form-input-with-icon {
+      padding-left: 2.5rem;
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-slate-50 via-white to-cyan-50/40 min-h-screen flex flex-col">
+
+  <!-- NAVBAR -->
+  <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/50">
+    <div class="max-w-7xl mx-auto px-6 py-2 flex justify-between items-center">
+      <a href="home.html" class="flex items-center gap-3 hover:opacity-80 transition">
+        <img src="assets/graphuralogo.png" class="h-14 w-auto" alt="Graphura Logo">
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="home.html"
+   class="inline-flex items-center gap-2
+          px-4 py-2 rounded-xl
+          text-sm font-semibold
+          text-slate-600
+          bg-white/60
+          border border-slate-200/70
+          hover:bg-white/80
+          hover:text-slate-900
+          hover:border-slate-300
+          transition-all duration-200">
+
+  <i class="fas fa-arrow-left text-xs text-slate-400"></i>
+  Back to Home
+</a>
+
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-1 flex items-center justify-center px-4 py-6 md:py-8">
+    <div class="w-full max-w-6xl">
+      
+      <!-- CONTAINER -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center">
+        
+        <!-- LEFT SIDE - BRANDING -->
+        <div class="hidden lg:flex flex-col justify-center space-y-6">
+          <div>
+            <h1 class="text-4xl lg:text-5xl font-extrabold mb-4">
+              <span class="text-slate-900">Manage Your</span><br>
+              <span class="gradient-text">Social Media</span><br>
+              <span class="text-slate-900">From One Dashboard</span>
+            </h1>
+            <p class="text-base text-slate-600 max-w-md leading-relaxed">
+              A Unified Platform to Manage, Schedule, and Grow Your Social Media
+            </p>
+          </div>
+          
+          
+          <div class="space-y-3">
+           
+          </div>
+        </div>
+        
+        <!-- RIGHT SIDE - AUTH FORMS -->
+        <div class="w-full">
+          
+          <!-- SIGN UP FORM (INITIALLY HIDDEN) -->
+          <div id="signupForm" class="form-slide hidden form-card glass rounded-3xl p-6 md:p-10 h-[590px] flex flex-col justify-between">
+            <div>
+              <div class="mb-8 text-center">
+                <div class="inline-block mb-4 p-3 bg-gradient-to-br from-cyan-100/80 to-blue-100/80 rounded-2xl">
+                  <i class="fas fa-user-plus text-cyan-600 text-2xl"></i>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2">Create Account</h2>
+                <p class="text-sm text-slate-600 tracking-wide">Start managing all your social media in one place</p>
+              </div>
+              
+              <form id="signupFormElement" class="space-y-4">
+                <div class="form-group">
+                  <label class="form-label"><i class="fas fa-user text-cyan-500 mr-2"></i>Username</label>
+                  <div class="input-wrapper">
+                    <input id="suName" type="text" placeholder="Choose your username"
+                      class="form-input form-input-with-icon w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm outline-none">
+                  </div>
+                  <p id="suNameError" class="hidden error-message text-xs text-red-500 mt-1.5 flex items-center"><i class="fas fa-exclamation-circle mr-1.5"></i></p>
+                </div>
+                
+                <div class="form-group">
+                  <label class="form-label"><i class="fas fa-envelope text-cyan-500 mr-2"></i>Email Address</label>
+                  <div class="input-wrapper">
+                    <input id="suEmail" type="email" placeholder="you@example.com"
+                      class="form-input form-input-with-icon w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm outline-none">
+                  </div>
+                  <p id="suEmailError" class="hidden error-message text-xs text-red-500 mt-1.5 flex items-center"><i class="fas fa-exclamation-circle mr-1.5"></i></p>
+                </div>
+                
+                <div class="form-group">
+                  <label class="form-label"><i class="fas fa-lock text-cyan-500 mr-2"></i>Password</label>
+                  <div class="input-wrapper">
+                    <input id="suPassword" type="password" placeholder="Minimum 8 characters"
+                      class="form-input form-input-with-icon w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm outline-none">
+                  </div>
+                  <p id="suPasswordError" class="hidden error-message text-xs text-red-500 mt-1.5 flex items-center"><i class="fas fa-exclamation-circle mr-1.5"></i></p>
+                </div>
+                
+                <button type="submit" class="btn-gradient w-full py-3 rounded-xl font-bold text-white text-sm bg-gradient-to-r from-cyan-400 to-blue-500 shadow-lg mt-4 relative group">
+                  <span class="relative z-10 flex items-center justify-center gap-2">
+                    <i class="fas fa-arrow-right"></i>
+                    Create Account
+                  </span>
+                </button>
+              </form>
+            </div>
+            
+            <div class="text-center pt-4 border-t border-slate-200/60">
+              <p class="text-sm text-slate-700">Already have an account? 
+                <button onclick="toggleForm()" class="font-bold text-transparent bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text hover:opacity-80 transition">Sign In</button>
+              </p>
+            </div>
+          </div>
+          
+          <!-- SIGN IN FORM (INITIALLY VISIBLE) -->
+          <div id="signinForm" class="form-slide form-card glass rounded-3xl p-6 md:p-10 h-[550px] flex flex-col justify-between">
+            <div>
+              <div class="mb-8 text-center">
+                <div class="inline-block mb-4 p-3 bg-gradient-to-br from-cyan-100/80 to-blue-100/80 rounded-2xl">
+                  <i class="fas fa-sign-in-alt text-cyan-600 text-2xl"></i>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2">Welcome Back</h2>
+                <p class="text-sm text-slate-600 tracking-wide">Sign in to your Graphura account</p>
+              </div>
+              
+              <form id="loginFormElement" class="space-y-4">
+                <div class="form-group">
+                  <label class="form-label"><i class="fas fa-envelope text-cyan-500 mr-2"></i>Email Address</label>
+                  <div class="input-wrapper">
+                    <input id="liEmail" type="email" placeholder="you@example.com"
+                      class="form-input form-input-with-icon w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm outline-none">
+                  </div>
+                  <p id="liEmailError" class="hidden error-message text-xs text-red-500 mt-1.5 flex items-center"><i class="fas fa-exclamation-circle mr-1.5"></i></p>
+                </div>
+                
+                <div class="form-group">
+                  <label class="form-label"><i class="fas fa-lock text-cyan-500 mr-2"></i>Password</label>
+                  <div class="input-wrapper">
+                    <input id="liPassword" type="password" placeholder="Enter your password"
+                      class="form-input form-input-with-icon w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm outline-none">
+                  </div>
+                  <p id="liPasswordError" class="hidden error-message text-xs text-red-500 mt-1.5 flex items-center"><i class="fas fa-exclamation-circle mr-1.5"></i></p>
+                </div>
+                
+                <button type="submit" class="btn-gradient w-full py-3 rounded-xl font-bold text-white text-sm bg-gradient-to-r from-cyan-400 to-blue-500 shadow-lg mt-4 relative group">
+                  <span class="relative z-10 flex items-center justify-center gap-2">
+                    <i class="fas fa-arrow-right"></i>
+                    Sign In
+                  </span>
+                </button>
+              </form>
+            </div>
+            
+            <div class="text-center pt-6 border-t border-slate-200/60">
+              <p class="text-sm text-slate-700">Don't have an account? 
+                <button onclick="toggleForm()" class="font-bold text-transparent bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text hover:opacity-80 transition">Sign Up</button>
+              </p>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- BACKGROUND EFFECTS -->
+  <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+    <div class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-cyan-300/20 to-blue-300/10 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-blue-300/10 to-cyan-300/5 rounded-full blur-3xl"></div>
+  </div>
+
+  <script>
+    function toggleForm() {
+      const signupForm = document.getElementById('signupForm');
+      const signinForm = document.getElementById('signinForm');
+      
+      signupForm.classList.toggle('hidden');
+      signinForm.classList.toggle('hidden');
+      signupForm.classList.add('form-enter');
+      signinForm.classList.add('form-enter');
+    }
+
+    // Handle form switching based on URL parameter or button click
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const mode = urlParams.get('mode');
+      
+      if (mode === 'signup') {
+        toggleForm(); // Show signup form
+      }
+    });
+    
+    // LOGIN
+    document.getElementById('loginFormElement').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('liEmail').value.trim();
+      const password = document.getElementById('liPassword').value;
+      
+      // Clear errors
+      document.getElementById('liEmailError').classList.add('hidden');
+      document.getElementById('liPasswordError').classList.add('hidden');
+      
+      // Validate
+      if (!email) {
+        document.getElementById('liEmailError').textContent = 'Email is required';
+        document.getElementById('liEmailError').classList.remove('hidden');
+        return;
+      }
+      if (!password) {
+        document.getElementById('liPasswordError').textContent = 'Password is required';
+        document.getElementById('liPasswordError').classList.remove('hidden');
+        return;
+      }
+      
+      try {
+        const res = await fetch('http://localhost:8082/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        
+        const result = await res.json();
+        
+        if (res.ok) {
+          localStorage.setItem('authToken', result.token);
+          localStorage.setItem('userEmail', email);
+          localStorage.setItem('userName', result.username || 'User');
+          window.location.href = 'main.html';
+        } else {
+          document.getElementById('liEmailError').textContent = result.message || 'Invalid email or password';
+          document.getElementById('liEmailError').classList.remove('hidden');
+        }
+      } catch (err) {
+        document.getElementById('liEmailError').textContent = 'Backend not reachable';
+        document.getElementById('liEmailError').classList.remove('hidden');
+      }
+    });
+    
+    // SIGNUP
+    document.getElementById('signupFormElement').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const username = document.getElementById('suName').value.trim();
+      const email = document.getElementById('suEmail').value.trim();
+      const password = document.getElementById('suPassword').value;
+      
+      // Clear errors
+      document.getElementById('suNameError').classList.add('hidden');
+      document.getElementById('suEmailError').classList.add('hidden');
+      document.getElementById('suPasswordError').classList.add('hidden');
+      
+      // Validate
+      if (!username) {
+        document.getElementById('suNameError').textContent = 'Username is required';
+        document.getElementById('suNameError').classList.remove('hidden');
+        return;
+      }
+      if (username.length < 3) {
+        document.getElementById('suNameError').textContent = 'Username must be at least 3 characters';
+        document.getElementById('suNameError').classList.remove('hidden');
+        return;
+      }
+      if (!email) {
+        document.getElementById('suEmailError').textContent = 'Email is required';
+        document.getElementById('suEmailError').classList.remove('hidden');
+        return;
+      }
+      if (!password || password.length < 8) {
+        document.getElementById('suPasswordError').textContent = 'Password must be at least 8 characters';
+        document.getElementById('suPasswordError').classList.remove('hidden');
+        return;
+      }
+      
+      try {
+        const res = await fetch('http://localhost:8082/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, email, password })
+        });
+        
+        const result = await res.json();
+        
+        if (res.ok && result.success) {
+          alert('Account created! Please sign in.');
+          toggleForm();
+          document.getElementById('loginFormElement').reset();
+        } else {
+          document.getElementById('suEmailError').textContent = result.message || 'Signup failed';
+          document.getElementById('suEmailError').classList.remove('hidden');
+        }
+      } catch (err) {
+        document.getElementById('suEmailError').textContent = 'Backend not reachable';
+        document.getElementById('suEmailError').classList.remove('hidden');
+      }
+    });
+  </script>
+
+</body>
+</html>

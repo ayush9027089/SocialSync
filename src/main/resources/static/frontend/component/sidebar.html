@@ -1,0 +1,120 @@
+<aside class="w-72 bg-white border-r px-4 py-6 flex flex-col justify-between h-screen">
+
+  <div>
+    <h2 class="text-sm font-semibold text-gray-500 mb-4">Channels</h2>
+
+    <ul class="space-y-2">
+
+      <li class="channel-item flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer"
+          data-channel="all">
+        <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+    <!-- grid / channels icon -->
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="w-5 h-5"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2">
+      <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" />
+    </svg>
+  </div>
+        <span>All Channels</span>
+      </li>
+
+      <li class="channel-item flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer"
+          data-channel="instagram">
+        <div class="w-8 h-8 flex items-center justify-center rounded-full border border-dashed">
+          📷
+        </div>
+        <span>Connect Instagram</span>
+      </li>
+
+      <li class="channel-item flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer"
+          data-channel="threads">
+        <div class="w-8 h-8 flex items-center justify-center rounded-full border border-dashed">
+          @
+        </div>
+        <span>Connect Threads</span>
+      </li>
+
+      <li class="channel-item flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer"
+          data-channel="linkedin">
+        <div class="w-8 h-8 flex items-center justify-center rounded-full border border-dashed">
+          in
+        </div>
+        <span>Connect LinkedIn</span>
+      </li>
+
+      <li class="channel-item hidden flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer"
+          data-channel="facebook">
+        <div class="w-8 h-8 flex items-center justify-center rounded-full border border-dashed">
+          f
+        </div>
+        <span>Connect Facebook</span>
+      </li>
+
+      <li class="channel-item hidden flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer"
+          data-channel="youtube">
+        <div class="w-8 h-8 flex items-center justify-center rounded-full border border-dashed">
+          ▶
+        </div>
+        <span>Connect YouTube</span>
+      </li>
+
+      <li class="channel-item hidden flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer"
+          data-channel="tiktok">
+        <div class="w-8 h-8 flex items-center justify-center rounded-full border border-dashed">
+          ♪
+        </div>
+        <span>Connect TikTok</span>
+      </li>
+
+      <li class="channel-item hidden flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer"
+          data-channel="twitter">
+        <div class="w-8 h-8 flex items-center justify-center rounded-full border border-dashed">
+          𝕏
+        </div>
+        <span>Connect Twitter/X</span>
+      </li>
+
+      <li class="channel-item hidden flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer"
+          data-channel="snapchat">
+        <div class="w-8 h-8 flex items-center justify-center rounded-full border border-dashed">
+          👻
+        </div>
+        <span>Connect Snapchat</span>
+      </li>
+
+      <li class="channel-item hidden flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer"
+          data-channel="pinterest">
+        <div class="w-8 h-8 flex items-center justify-center rounded-full border border-dashed">
+          P
+        </div>
+        <span>Connect Pinterest</span>
+      </li>
+
+      <li class="channel-item hidden flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer"
+          data-channel="facebook">
+        <div class="w-8 h-8 flex items-center justify-center rounded-full border border-dashed">
+          f
+        </div>
+        <span>Connect Facebook</span>
+      </li>
+
+      <li class="mt-2">
+        <button id="showMoreBtn"
+          class="w-full flex items-center gap-3 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition">
+          ⌄ <span>Show more channels</span>
+        </button>
+      </li>
+
+    </ul>
+  </div>
+
+  <div class="space-y-3 text-sm">
+    <button>🏷 Manage Tags</button>
+    <button>⚙ Manage Channels</button>
+  </div>
+
+</aside>
