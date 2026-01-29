@@ -569,7 +569,7 @@
       // Get auth token for backend request
       const authToken = localStorage.getItem('authToken');
       
-      const response = await fetch('/api/contact/faq', {
+      const response = await fetch('http://localhost:8082/api/contact/faq', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

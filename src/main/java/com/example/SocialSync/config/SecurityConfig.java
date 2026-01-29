@@ -37,6 +37,7 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
             .requestMatchers("/auth/**", "/oauth/**", "/api/oauth/**").permitAll()
+            .requestMatchers("/api/contact/**").permitAll()
             .anyRequest().permitAll()   // 🔥 THIS LINE SAVES YOU
         )
         .sessionManagement(session ->
