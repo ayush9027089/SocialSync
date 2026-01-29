@@ -5,12 +5,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Graphura – Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Configuration file -->
+  <script src="config.js"></script>
 
   <style>
     .status-completed {
   background: linear-gradient(to right, #dcfce7, #bbf7d0);
   color: #166534;
   border: 1px solid #86efac;
+  padding: 0.375rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 640px) {
+  .status-completed {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.625rem;
+  }
+}
+
+/* Responsive status badge base styles */
+.status-badge {
+  padding: 0.375rem 0.625rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+@media (max-width: 640px) {
+  .status-badge {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
 }
 
     /* ===== SIDEBAR ===== */
@@ -530,10 +566,10 @@
         <div class="p-6 space-y-5 max-h-[60vh] overflow-y-auto">
             <!-- Status Badge -->
             <div class="flex items-center justify-between">
-              <div id="detailStatusBadge" class="px-4 py-2 rounded-lg text-sm font-bold">
+              <div id="detailStatusBadge" class="status-badge px-4 py-2 sm:px-3 sm:py-1.5 rounded-lg font-bold max-w-[200px] sm:max-w-[250px]">
                 Status
               </div>
-              <div id="detailPlatformIcon" class="w-12 h-12 rounded-lg flex items-center justify-center text-2xl"></div>
+              <div id="detailPlatformIcon" class="w-12 h-12 rounded-lg flex items-center justify-center text-2xl flex-shrink-0"></div>
             </div>
 
             <!-- Media Preview in Modal -->
@@ -800,7 +836,7 @@ document.getElementById('scheduleForm').addEventListener('submit', async (e) => 
             formData.append('file', mediaFile);
             
             // ===== UPLOAD MEDIA TO BACKEND =====
-            const mediaResponse = await fetch('http://localhost:8082/api/media/upload', {
+            const mediaResponse = await fetch(API_ENDPOINTS.MEDIA.UPLOAD, {
                 method: 'POST',
                 headers: {
                     'Authorization': 'Bearer ' + localStorage.getItem('authToken')
@@ -836,7 +872,7 @@ document.getElementById('scheduleForm').addEventListener('submit', async (e) => 
     };
 
     try {
-        const response = await fetch('http://localhost:8082/api/posts/schedule', {
+        const response = await fetch(API_ENDPOINTS.POSTS.SCHEDULE, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -919,7 +955,7 @@ function switchPostTab(tabName) {
 async function loadPosts() {
     const contentArea = document.getElementById('contentArea');
     try {
-        const response = await fetch('http://localhost:8082/api/posts/all', {
+        const response = await fetch(API_ENDPOINTS.POSTS.ALL, {
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('authToken') }
         });
         allPosts = await response.json();
@@ -1091,11 +1127,11 @@ function renderPostCards(posts, container) {
             <img src="${platformIcon}" alt="${post.platform}" class="w-full h-full object-contain">
           </div>
           <div class="flex flex-col items-end gap-1 flex-shrink-0">
-            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold whitespace-nowrap ${statusStyle}">
+            <span class="px-2.5 py-0.5 sm:px-2 sm:py-0.5 rounded-full text-xs sm:text-xs font-bold whitespace-nowrap overflow-hidden text-ellipsis max-w-xs ${statusStyle}">
            ${computedStatus}
           </span>
 
-            ${post.mediaUrl ? '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-gradient-to-r from-purple-100 to-pink-100 text-purple-600 whitespace-nowrap shadow-sm border border-purple-200/50">🖼️</span>' : ''}
+            ${post.mediaUrl ? '<span class="px-2.5 py-0.5 sm:px-2 sm:py-0.5 rounded-full text-xs sm:text-xs font-bold bg-gradient-to-r from-purple-100 to-pink-100 text-purple-600 whitespace-nowrap shadow-sm border border-purple-200/50">🖼️</span>' : ''}
           </div>
         </div>
 
@@ -1207,7 +1243,7 @@ function openPostDetailsModal(post) {
     // ===== STATUS BADGE (FIXED) =====
     const badge = document.getElementById('detailStatusBadge');
     badge.textContent = computedStatus;
-    badge.className = `px-4 py-2 rounded-lg text-sm font-bold ${statusStyles[computedStatus] || statusStyles["PENDING"]}`;
+    badge.className = `status-badge px-4 py-2 sm:px-3 sm:py-1.5 rounded-lg font-bold max-w-[200px] sm:max-w-[250px] ${statusStyles[computedStatus] || statusStyles["PENDING"]}`;
 
     // ===== MODAL HEADER =====
     document.getElementById('detailModalTitle').textContent = post.platform;
@@ -1294,7 +1330,7 @@ async function deletePost(postId) {
     }
 
     try {
-        const response = await fetch(`http://localhost:8082/api/posts/${postId}`, {
+        const response = await fetch(API_ENDPOINTS.POSTS.GET_BY_ID(postId), {
             method: 'DELETE',
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('authToken'),
@@ -1324,7 +1360,7 @@ async function deletePostFromModal() {
     }
 
     try {
-        const response = await fetch(`http://localhost:8082/api/posts/${currentPost.id}`, {
+        const response = await fetch(API_ENDPOINTS.POSTS.UPDATE(currentPost.id), {
             method: 'DELETE',
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('authToken'),

@@ -7,6 +7,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js for professional data visualization -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+  <!-- Configuration file -->
+  <script src="config.js"></script>
 
   <style>
     /* ===== SIDEBAR ===== */
@@ -539,7 +541,7 @@ async function initializeAnalytics() {
    */
   async function fetchPosts() {
     try {
-      const response = await fetch('http://localhost:8082/api/posts/all', {
+      const response = await fetch(API_ENDPOINTS.POSTS.ALL, {
         headers: {
           'Authorization': 'Bearer ' + localStorage.getItem('authToken')
         }
@@ -565,9 +567,17 @@ async function initializeAnalytics() {
 
   document.getElementById('totalPostsCount').textContent = posts.length;
 
-  const uniquePlatforms = new Set(posts.map(p => p.platform));
-  document.getElementById('activePlatformsCount').textContent = uniquePlatforms.size;
+  // Get platforms with future scheduled posts only (active platforms)
+  const activePosts = posts.filter(post => {
+    if (!post.scheduledTime) return false;
+    const scheduledDate = new Date(post.scheduledTime);
+    return scheduledDate > now;
+  });
 
+  const activePlatforms = new Set(activePosts.map(p => p.platform));
+  document.getElementById('activePlatformsCount').textContent = activePlatforms.size;
+
+  // Get pending posts (PENDING status with future scheduled time)
   const pendingPosts = posts.filter(post => {
     if (!post.scheduledTime) return false;
 

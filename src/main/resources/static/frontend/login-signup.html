@@ -7,6 +7,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Configuration file -->
+  <script src="config.js"></script>
   <style>
     body { font-family: 'Inter', sans-serif; }
     html { scroll-behavior: smooth; }
@@ -458,7 +460,7 @@
       }
       
       try {
-        const res = await fetch('http://localhost:8082/auth/login', {
+        const res = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })
@@ -517,7 +519,7 @@
       }
       
       try {
-        const res = await fetch('http://localhost:8082/auth/signup', {
+        const res = await fetch(API_ENDPOINTS.AUTH.SIGNUP, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, email, password })

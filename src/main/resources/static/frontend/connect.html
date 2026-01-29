@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Graphura – Connect Channels</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Configuration file -->
+  <script src="config.js"></script>
 
   <style>
     /* ===== SIDEBAR ===== */
@@ -533,14 +535,12 @@
     try {
       // Platform-specific OAuth endpoints
         const oauthEndpoints = {
-        'YOUTUBE': 'http://localhost:8082/oauth/youtube/connect',
-        'LINKEDIN': 'http://localhost:8082/oauth/linkedin/connect?userId=' 
-      + encodeURIComponent(localStorage.getItem("userEmail") || ''),
-
-        'TWITTER': 'http://localhost:8082/oauth/twitter/connect',
-        'PINTEREST': 'http://localhost:8082/oauth/pinterest/connect',
+        'YOUTUBE': API_ENDPOINTS.OAUTH.YOUTUBE,
+        'LINKEDIN': API_ENDPOINTS.OAUTH.LINKEDIN(localStorage.getItem("userEmail") || ''),
+        'TWITTER': API_ENDPOINTS.OAUTH.TWITTER,
+        'PINTEREST': API_ENDPOINTS.OAUTH.PINTEREST,
         'WHATSAPP': 'https://graph.facebook.com/v17.0',
-        'FACEBOOK': 'http://localhost:8082/oauth/whatsapp/connect'
+        'FACEBOOK': API_ENDPOINTS.OAUTH.WHATSAPP
         };
 
       // Check if this platform has a direct OAuth endpoint
@@ -550,7 +550,7 @@
       }
 
       // Fallback: Generic connection API endpoint
-      const response = await fetch(`http://localhost:8082/api/channels/connect/${channel.toLowerCase()}`, {
+      const response = await fetch(API_ENDPOINTS.CHANNELS.CONNECT(channel), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -597,7 +597,7 @@
     }
 
     try {
-      const response = await fetch('http://localhost:8082/api/channels/status', {
+      const response = await fetch(API_ENDPOINTS.CHANNELS.STATUS, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
