@@ -118,7 +118,7 @@
 
 
 <!-- ================= HERO ================= -->
-<section id="hero" class="relative overflow-hidden py-40 min-h-[80vh] flex items-center justify-center scroll-mt-24">
+<section id="hero" class="relative overflow-hidden py-20 min-h-[90vh] flex items-center justify-center scroll-mt-24">
 
   <!-- Background Layers -->
   <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_#e0f7ff_0%,_#f0f9ff_25%,_#ffffff_50%)]"></div>
@@ -150,7 +150,7 @@
     </p>
 
     <!-- CTA BUTTONS -->
-    <div class="flex flex-col sm:flex-row justify-center gap-3">
+    <div class="flex flex-col sm:flex-row justify-center gap-3 mb-12">
 
       <!-- SIGNUP CTA (LOGGED OUT) -->
       <a href="login-signup.html"
@@ -176,7 +176,7 @@
     </div>
 
     <!-- TRUST POINTS -->
-    <div class="mt-10 flex flex-wrap justify-center gap-5 text-sm text-slate-600">
+    <div class="mt-[100px] flex flex-wrap justify-center gap-5 text-sm text-slate-600">
       <div class="flex items-center gap-2">
         <span class="text-green-500 text-lg">✓</span>
         <span>No subscription required</span>
@@ -194,47 +194,11 @@
   </div>
 </section>
 
-<!-- ================= HERO CTA LOGIC ================= -->
-<script>
-  function updateHeroCTA() {
-    const token = localStorage.getItem('authToken');
-
-    const signupBtn = document.getElementById('heroSignupBtn');
-    const dashboardBtn = document.getElementById('heroDashboardBtn');
-
-    if (token) {
-      signupBtn.classList.add('hidden');
-      dashboardBtn.classList.remove('hidden');
-    } else {
-      signupBtn.classList.remove('hidden');
-      dashboardBtn.classList.add('hidden');
-    }
-  }
-
-  window.addEventListener('DOMContentLoaded', updateHeroCTA);
-  
-  // Ensure top and hero Get Access buttons behave correctly when user is logged in
-  document.addEventListener('DOMContentLoaded', function() {
-    const topSignup = document.getElementById('signupBtn');
-    const heroSignup = document.getElementById('heroSignupBtn');
-
-    function handleSignupClick(e) {
-      const token = localStorage.getItem('authToken');
-      if (token) {
-        e.preventDefault();
-        window.location.href = 'main.html';
-      }
-      // otherwise allow default (go to login-signup.html)
-    }
-
-    if (topSignup) topSignup.addEventListener('click', handleSignupClick);
-    if (heroSignup) heroSignup.addEventListener('click', handleSignupClick);
-  });
-</script>
+<!-- HERO CTA handled in main script below -->
 
 
 <!-- ================= STATS SECTION ================= -->
-<section id="stats" class="relative py-14 overflow-hidden scroll-mt-24">
+<section id="stats" class="relative py-6 overflow-hidden scroll-mt-24">
 
   <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,_#e0fbff_0%,_#f8feff_40%,_#ffffff_70%)]"></div>
   <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_#f0f9ff_0%,_transparent_50%)]"></div>
@@ -500,10 +464,10 @@
 <!-- ================= FOOTER ================= -->
 <footer class="w-full bg-white border-t border-slate-200 text-slate-600">
 
-  <div class="max-w-7xl mx-auto px-6 py-14">
+  <div class="max-w-7xl mx-auto px-6 py-10">
 
     <!-- Main Footer Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
 
       <!-- Brand -->
       <div class="flex flex-col items-center text-center gap-4">
@@ -511,7 +475,7 @@
        class="h-16 w-auto"
        alt="Graphura Logo">
   
-  <p class="text-sm leading-relaxed max-w-sm text-slate-600">
+  <p class="text-sm leading-relaxed max-w-xs text-slate-600">
     Graphura is a unified social media management platform that helps
     teams publish, manage, and analyze content from one powerful dashboard.
   </p>
@@ -521,11 +485,11 @@
 </div>
 
       <!-- Quick Links -->
-      <div>
+      <div class="text-center">
         <h4 class="text-sm font-semibold text-slate-900 uppercase tracking-wide mb-4">
           Quick Links
         </h4>
-        <ul class="space-y-3">
+        <ul class="space-y-3 text-center">
           <li><a href="#hero" class="footer-link">Home</a></li>
           <li><a href="#features" class="footer-link">Features</a></li>
           <li><a href="#analytics" class="footer-link">Dashboard</a></li>
@@ -534,24 +498,34 @@
       </div>
 
       <!-- Product -->
-      <div>
-        <h4 class="text-sm font-semibold text-slate-900 uppercase tracking-wide mb-4">
-          Product
-        </h4>
-        <ul class="space-y-3">
-          <li><a href="#features" class="footer-link">Publish Everywhere</a></li>
-          <li><a href="#features" class="footer-link">Content Creation</a></li>
-          <li><a href="#features" class="footer-link">Engagement Tools</a></li>
-          <li><a href="#analytics" class="footer-link">Analytics & Insights</a></li>
-        </ul>
-      </div>
+    <div class="text-center">
+  <h4 class="text-sm font-semibold text-slate-900 uppercase tracking-wide mb-4">
+    Product
+  </h4>
+
+  <ul class="space-y-3 text-center">
+    <li>
+      <a href="https://www.graphura.in/services/smm.html" class="footer-link">Social Media Marketing</a>
+    </li>
+    <li>
+      <a href="https://www.graphura.in/services/smo.html" class="footer-link">Social Media Optimization</a>
+    </li>
+    <li>
+      <a href="https://www.graphura.in/services/seo.html" class="footer-link">SEO & Search Visibility</a>
+    </li>
+    <li>
+      <a href="https://www.graphura.in/services/web-development.html" class="footer-link">Web Development Solutions</a>
+    </li>
+  </ul>
+</div>
+
 
       <!-- Contact Us -->
-      <div>
+      <div class="text-center">
         <h4 class="text-sm font-semibold text-slate-900 uppercase tracking-wide mb-4">
           Contact Us
         </h4>
-        <ul class="space-y-3 text-sm">
+        <ul class="space-y-3 text-sm text-center">
           <li>
             Graphura India Private Limited<br>
             <span class="text-slate-500">
@@ -575,29 +549,28 @@
     </div>
 
     <!-- Divider -->
-    <div class="mt-12 border-t border-slate-200/60 pt-6">
+    <div class="mt-8 border-t border-slate-200/60 pt-4">
 
-      <!-- Bottom Bar -->
-      <div class="flex flex-col md:flex-row items-center justify-center gap-4">
-        <p class="text-xs text-slate-500 text-center">
-          © 2026 Graphura India Private Limited. All rights reserved.
-        </p>
+        <!-- Bottom Bar -->
+       <div class="flex flex-col md:flex-row items-center justify-center gap-4">
+  <p class="text-xs text-slate-500 text-center">
+    © <span id="current-year"></span> Graphura India Private Limited. All rights reserved.
+  </p>
+</div>
 
+
+      </div>
     </div>
-
-  </div>
-</footer>
-
-<!-- Footer Link Utility -->
-<style>
-  .footer-link {
-    @apply text-slate-600 hover:text-slate-900 transition;
-  }
-</style>
+  </footer>
 
 
 
 <script>
+  // Set current year in footer
+  
+  document.getElementById('current-year').textContent = new Date().getFullYear();
+
+  // Initialize Lucide icons
   lucide.createIcons();
     
   function updateHeroCTA() {
@@ -617,6 +590,24 @@
 
   window.addEventListener('DOMContentLoaded', updateHeroCTA);
 
+  // Ensure top and hero Get Access buttons behave correctly when user is logged in
+  document.addEventListener('DOMContentLoaded', function() {
+    const topSignup = document.getElementById('signupBtn');
+    const heroSignup = document.getElementById('heroSignupBtn');
+
+    function handleSignupClick(e) {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        e.preventDefault();
+        window.location.href = 'main.html';
+      }
+      // otherwise allow default (go to login-signup.html)
+    }
+
+    if (topSignup) topSignup.addEventListener('click', handleSignupClick);
+    if (heroSignup) heroSignup.addEventListener('click', handleSignupClick);
+  });
+
   function checkLoginStatus() {
     const token = localStorage.getItem('authToken');
     const userEmail = localStorage.getItem('userEmail');
@@ -635,10 +626,11 @@
 
       userNameDisplay.textContent = `Hi, ${userName}`;
       userNameDisplay.classList.remove('hidden');
+      const ctaButton = document.getElementById('ctaButton');
       if (token && ctaButton) {
-      ctaButton.textContent = 'Go to dashboard →';
-      ctaButton.href = 'main.html';
-    }
+        ctaButton.textContent = 'Go to dashboard →';
+        ctaButton.href = 'main.html';
+      }
 
     } else {
       // USER IS LOGGED OUT

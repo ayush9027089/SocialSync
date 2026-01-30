@@ -513,11 +513,22 @@ async function initializeAnalytics() {
 
     await updateStatistics(cachedPosts);
 
-    const activePosts = cachedPosts.filter(
+    // Filter posts from last 30 days for timeline chart
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const timelinePosts = cachedPosts.filter(p => {
+      if (!p.scheduledTime) return false;
+      const postDate = new Date(p.scheduledTime);
+      return postDate >= thirtyDaysAgo;
+    });
+
+    // Get pending/future posts for platform distribution chart
+    const pendingPosts = cachedPosts.filter(
       p => new Date(p.scheduledTime) > new Date()
     );
 
-    renderChartsWithData(activePosts);
+    renderChartsWithData(timelinePosts, pendingPosts);
 
     if (pendingInterval) clearInterval(pendingInterval);
 
@@ -623,15 +634,16 @@ async function initializeAnalytics() {
   /**
    * Render charts with real post data
    * Aggregates data by date and platform
-   * @param {Array} posts - Array of post objects
+   * @param {Array} timelinePosts - Array of post objects for timeline (last 30 days)
+   * @param {Array} pendingPosts - Array of pending post objects for platform distribution
    */
-  function renderChartsWithData(posts) {
+  function renderChartsWithData(timelinePosts, pendingPosts) {
     // Data aggregation for timeline chart
-    const timelineData = aggregatePostsByDate(posts);
+    const timelineData = aggregatePostsByDate(timelinePosts);
     renderTimelineChart(timelineData);
 
-    // Data aggregation for platform distribution chart
-    const platformData = aggregatePostsByPlatform(posts);
+    // Data aggregation for platform distribution chart (pending posts only)
+    const platformData = aggregatePostsByPlatform(pendingPosts);
     renderPlatformChart(platformData);
   }
 
@@ -646,7 +658,7 @@ async function initializeAnalytics() {
     const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
 
     // Initialize all dates in range
-    for (let d = new Date(thirtyDaysAgo); d <= today; d.setDate(d.getDate() + 1)) {
+    for (let d = new Date(thirtyDaysAgo); d <= today; d = new Date(d.getTime() + 24 * 60 * 60 * 1000)) {
       const dateStr = d.toISOString().split('T')[0];
       dateMap[dateStr] = 0;
     }
