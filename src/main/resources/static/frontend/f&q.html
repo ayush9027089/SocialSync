@@ -19,13 +19,13 @@
       transition: all 0.25s ease;
     }
     .sidebar-link:hover {
-      background: rgba(6,182,212,0.08);
-      color: #0891b2;
+      background: rgba(249,115,22,0.08);
+      color: #f97316;
     }
     .sidebar-active {
-      background: rgba(6,182,212,0.15);
-      color: #0891b2;
-      box-shadow: inset 0 0 0 1px rgba(6,182,212,0.25);
+      background: rgba(249,115,22,0.15);
+      color: #f97316;
+      box-shadow: inset 0 0 0 1px rgba(249,115,22,0.25);
       backdrop-filter: blur(12px);
     }
 
@@ -37,8 +37,8 @@
       width: 38px;
       height: 38px;
       border-radius: 8px;
-      background: rgba(6, 182, 212, 0.12);
-      border: 1px solid rgba(6, 182, 212, 0.25);
+      background: rgba(249, 115, 22, 0.12);
+      border: 1px solid rgba(249, 115, 22, 0.25);
       cursor: pointer;
       transition: all 0.25s ease;
       flex-direction: column;
@@ -47,14 +47,14 @@
     }
 
     .mobile-menu-btn:hover {
-      background: rgba(6, 182, 212, 0.2);
-      border-color: rgba(6, 182, 212, 0.4);
+      background: rgba(249, 115, 22, 0.2);
+      border-color: rgba(249, 115, 22, 0.4);
     }
 
     .mobile-menu-btn span {
       width: 18px;
       height: 2px;
-      background: #0891b2;
+      background: #f97316;
       display: block;
       margin: 2.5px 0;
       transition: all 0.25s ease;
@@ -83,8 +83,8 @@
       top: 0;
       height: 100vh;
       width: 256px;
-      background: white;
-      border-r: 1px solid rgba(6, 182, 212, 0.3);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 247, 237, 0.95) 100%);
+      border-r: 2px solid rgba(249, 115, 22, 0.3);
       transform: translateX(-100%);
       transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
       z-index: 40;
@@ -98,44 +98,73 @@
 
     /* FAQ ACCORDION */
     .faq-item {
-      border: 1px solid rgba(6,182,212,0.15);
-      border-radius: 10px;
+      border: 1px solid rgba(15, 23, 42, 0.06);
+      border-radius: 0.75rem;
       overflow: hidden;
-      background: white;
-      transition: all 0.25s ease;
+      background: transparent;
+      transition: box-shadow 0.24s ease, border-color 0.24s ease, transform 0.24s ease;
+      position: relative;
+    }
+    .faq-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(15,23,42,0.02), rgba(15,23,42,0.05), rgba(15,23,42,0.02));
     }
     .faq-item:hover {
-      border-color: rgba(6,182,212,0.3);
-      box-shadow: 0 2px 8px rgba(6,182,212,0.1);
+      border-color: rgba(15,23,42,0.12);
+      box-shadow: 0 6px 18px rgba(2,6,23,0.04);
+      transform: translateY(-2px);
+    }
+    .faq-item.open {
+      border-color: rgba(15,23,42,0.14);
+      box-shadow: 0 8px 22px rgba(2,6,23,0.05);
     }
     .faq-question {
       cursor: pointer;
-      padding: 0.875rem 1rem;
+      padding: 0.875rem 1.125rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       color: #1e293b;
-      transition: all 0.25s ease;
+      transition: all 0.3s ease;
       user-select: none;
+      background: linear-gradient(90deg, rgba(249,115,22,0) 0%, rgba(249,115,22,0.02) 100%);
     }
     .faq-question:hover {
-      color: #0891b2;
+      color: #f97316;
+      background: linear-gradient(90deg, rgba(249,115,22,0.02) 0%, rgba(249,115,22,0.06) 100%);
+    }
+    .faq-item.open .faq-question {
+      color: #f97316;
+      background: linear-gradient(90deg, rgba(249,115,22,0.04) 0%, rgba(249,115,22,0.08) 100%);
     }
     .faq-question span {
-      font-size: 1.25rem;
-      color: #0891b2;
+      font-size: 1.2rem;
+      color: #f97316;
       flex-shrink: 0;
       margin-left: 0.5rem;
+      transition: color 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .faq-item.open .faq-question span {
+      color: #ec4899;
     }
     .faq-answer {
-      padding: 0 1rem 0.875rem;
+      padding: 0 1.125rem 0.875rem;
       display: none;
       color: #475569;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       line-height: 1.5;
-      animation: slideDown 0.3s ease;
+      animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      background: linear-gradient(90deg, rgba(249,115,22,0.02) 0%, rgba(249,115,22,0.01) 100%);
     }
     .faq-item.open .faq-answer {
       display: block;
@@ -152,18 +181,27 @@
     }
 
     /* FORM STYLING */
+    input, textarea {
+      border: 2px solid rgba(249,115,22,0.2);
+      transition: all 0.3s ease;
+    }
     input:focus, textarea:focus {
-      box-shadow: 0 0 0 3px rgba(6,182,212,0.1);
-      border-color: #0891b2;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(249,115,22,0.15);
+      border-color: #f97316;
+      background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(249,115,22,0.02) 100%);
+    }
+    input::placeholder, textarea::placeholder {
+      color: rgba(71, 85, 105, 0.6);
     }
 
     .submit-btn {
-      background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+      background: linear-gradient(135deg, #f97316 0%, #ec4899 100%);
       transition: all 0.3s ease;
     }
     .submit-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(6,182,212,0.3);
+      box-shadow: 0 8px 24px rgba(249,115,22,0.3);
     }
     .submit-btn:active {
       transform: translateY(0);
@@ -173,98 +211,158 @@
 
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
-<div class="flex min-h-screen">
+<!-- MOBILE SIDEBAR OVERLAY -->
+<div id="mobileSidebarOverlay" class="mobile-sidebar-overlay" onclick="closeMobileSidebar()"></div>
 
-  <!-- ===== MOBILE SIDEBAR OVERLAY ===== -->
-  <div class="mobile-sidebar-overlay" id="mobileSidebarOverlay" onclick="closeMobileSidebar()"></div>
-
-  <!-- ===== MOBILE SIDEBAR ===== -->
-  <div class="mobile-sidebar" id="mobileSidebar">
-    <div class="px-4 py-4 border-b flex items-center justify-between">
+<!-- MOBILE SIDEBAR -->
+<aside id="mobileSidebar" class="mobile-sidebar">
+  <!-- LOGO -->
+  <div class="px-4 py-4 border-b flex items-center justify-between">
       <img src="assets/graphuralogo.png" class="h-12" alt="Graphura Logo" />
       <button class="text-gray-500 hover:text-gray-700 text-xl" onclick="closeMobileSidebar()">✕</button>
     </div>
 
-    <nav class="px-3 py-4 space-y-1">
-      <a href="main.html" class="sidebar-link" onclick="closeMobileSidebar()">Dashboard</a>
-      <a href="connect.html" class="sidebar-link" onclick="closeMobileSidebar()">Channels</a>
-      <a href="analysis.html" class="sidebar-link" onclick="closeMobileSidebar()">Analytics</a>
-      <a href="help.html" class="sidebar-link" onclick="closeMobileSidebar()">Help & Guide</a>
-      <a href="f&q.html" class="sidebar-link sidebar-active" onclick="closeMobileSidebar()">FAQs</a>
-    </nav>
+  <!-- NAV -->
+  <nav class="px-4 py-6 space-y-1 flex-1">
+    <a href="main.html" class="sidebar-link" onclick="closeMobileSidebar()">
+      Dashboard
+    </a>
+    <a href="connect.html" class="sidebar-link" onclick="closeMobileSidebar()">
+      Channels
+    </a>
+    <a href="analysis.html" class="sidebar-link" onclick="closeMobileSidebar()">
+      Analytics
+    </a>
+    <a href="help.html" class="sidebar-link" onclick="closeMobileSidebar()">
+      Help & Guide
+    </a>
+    <a href="f&q.html" class="sidebar-link sidebar-active" onclick="closeMobileSidebar()">
+      FAQs
+    </a>
+  </nav>
 
-    <div class="p-3 border-t space-y-3 mt-auto">
-      <!-- Mobile Sidebar Profile Button -->
-      <button id="mobileSidebarProfileBtn"
-        class="w-full flex items-center gap-3 p-3 rounded-xl bg-white shadow-sm hover:shadow transition">
-        <div class="w-9 h-9 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center font-bold flex-shrink-0">
-          <img src="assets/user_icon.png" class="w-5 h-5" alt="User" />
-        </div>
-        <div class="min-w-0 text-left">
-          <p id="mobileUserName" class="text-xs font-semibold text-slate-800 leading-tight">User</p>
-          <p id="mobileUserEmail" class="text-xs text-slate-500 leading-tight truncate">user@email.com</p>
-        </div>
-      </button>
-
-      <!-- Mobile Dropdown -->
-      <div id="mobileSidebarProfileMenu" class="hidden px-3 py-2 bg-slate-50 rounded-lg">
-        <button onclick="window.location.href='home.html'" class="w-full px-3 py-2 text-left text-slate-700 hover:bg-slate-100 rounded text-sm font-medium transition border-b mb-1">
-          Go to Home
-        </button>
-        <button onclick="logout()" class="w-full px-3 py-2 text-left text-red-600 hover:bg-red-50 rounded text-sm font-medium transition">
-          Logout
-        </button>
+  <!-- USER PROFILE -->
+  <div class="p-4 border-t relative">
+    <button id="mobileSidebarProfileBtn"
+      class="w-full flex items-center gap-3 p-3 rounded-full bg-white/80 border border-orange-200/40 shadow-sm hover:shadow-md hover:bg-orange-50/60 hover:border-orange-300/60 transition">
+      <div class="w-9 h-9 rounded-full bg-gradient-to-br from-orange-200 to-pink-200 flex items-center justify-center font-bold">
+        <img src="assets/user_icon.png" class="w-5 h-5" />
       </div>
+      <div class="truncate text-left">
+        <p id="mobileSidebarUserName" class="text-sm font-semibold text-slate-800">User</p>
+        <p id="mobileSidebarUserEmail" class="text-xs text-slate-600 truncate"></p>
+      </div>
+    </button>
+
+    <!-- DROPDOWN -->
+    <div id="mobileSidebarProfileMenu"
+      class="hidden absolute bottom-20 left-4 right-4 bg-white border rounded-xl shadow-xl overflow-hidden z-50">
+      <button onclick="window.location.href='home.html'"
+        class="w-full px-4 py-3 text-left text-slate-700 hover:bg-slate-50 font-medium border-b">
+        Go to Home
+      </button>
+      <button onclick="logout()"
+        class="w-full px-4 py-3 text-left text-red-600 hover:bg-red-50 font-medium">
+        Logout
+      </button>
     </div>
   </div>
+</aside>
 
-  <!-- ===== DESKTOP SIDEBAR ===== -->
-  <aside class="hidden lg:flex fixed left-0 top-0 h-screen w-64 bg-white border-r border-cyan-200/30 flex flex-col justify-between">
+<!-- ================= APP LAYOUT ================= -->
+<div class="flex min-h-screen">
 
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="hidden lg:flex fixed left-0 top-0 h-screen w-64 bg-white border-r border-orange-200/30 flex flex-col justify-between">
+
+    <!-- LOGO -->
     <div class="px-6 py-6 border-b flex items-center justify-center">
-      <img src="assets/graphuralogo.png" class="h-16" alt="Graphura Logo" />
+      <img src="assets/graphuralogo.png" class="h-16" />
     </div>
 
+    <!-- NAV -->
     <nav class="px-4 py-6 space-y-1 flex-1">
-      <a href="main.html" class="sidebar-link">Dashboard</a>
-      <a href="connect.html" class="sidebar-link">Channels</a>
-      <a href="analysis.html" class="sidebar-link">Analytics</a>
-      <a href="help.html" class="sidebar-link">Help & Guide</a>
-      <a href="f&q.html" class="sidebar-link sidebar-active">FAQs</a>
+
+      <a href="main.html" class="sidebar-link">
+        Dashboard
+      </a>
+      <a href="connect.html" class="sidebar-link">
+        Channels
+      </a>
+      <a href="analysis.html" class="sidebar-link">
+        Analytics
+      </a>
+      <a href="help.html" class="sidebar-link">
+        Help & Guide
+      </a>
+      <a href="f&q.html" class="sidebar-link sidebar-active">
+        FAQs
+      </a>
+
     </nav>
 
+    <!-- USER PROFILE -->
     <div class="p-4 relative">
-      <!-- Desktop Sidebar Profile Button -->
-      <button id="sidebarProfileBtn"
-        class="mt-auto w-full flex items-center gap-3 px-4 py-3 border-t border-slate-200 hover:bg-slate-50 transition">
-        <!-- Avatar -->
-        <div class="w-10 h-10 rounded-full bg-cyan-100 flex items-center justify-center shrink-0">
-          <img src="assets/user_icon.png" class="w-5 h-5" alt="User" />
-        </div>
 
-        <!-- User Info -->
-        <div class="min-w-0 text-left">
-          <p id="sidebarUserName" class="text-sm font-semibold text-slate-800 leading-tight">User</p>
-          <p id="sidebarUserEmail" class="text-xs text-slate-500 leading-tight break-all">user@email.com</p>
-        </div>
-      </button>
+      <!-- Sidebar Profile (place LAST in sidebar) -->
+<button id="sidebarProfileBtn"
+  class="mt-auto w-full flex items-center gap-3
+         px-4 py-3
+         rounded-full
+         bg-white/80 border border-orange-200/40
+         hover:bg-orange-50/60 hover:border-orange-300/60
+         shadow-sm hover:shadow-md
+         transition">
+
+  <!-- Avatar -->
+  <div class="w-10 h-10 rounded-full
+              bg-gradient-to-br from-orange-200 to-pink-200
+              flex items-center justify-center
+              shrink-0">
+    <img src="assets/user_icon.png" class="w-5 h-5" alt="User" />
+  </div>
+
+  <!-- User Info -->
+  <div class="min-w-0 text-left">
+    <p id="sidebarUserName"
+       class="text-sm font-semibold text-slate-800 leading-tight">
+      User
+    </p>
+
+    <!-- Email: readable, not truncated harshly -->
+    <p id="sidebarUserEmail"
+       class="text-xs text-slate-600 leading-tight break-all">
+      user@email.com
+    </p>
+  </div>
+
+</button>
+
 
       <!-- DROPDOWN -->
-      <div id="sidebarProfileMenu" class="hidden absolute bottom-20 left-4 right-4 bg-white border rounded-xl shadow-xl overflow-hidden z-50">
-        <button onclick="window.location.href='home.html'" class="w-full px-4 py-3 text-left text-slate-700 hover:bg-slate-50 font-medium border-b">
+      <div id="sidebarProfileMenu"
+        class="hidden absolute bottom-20 left-4 right-4 bg-white border rounded-xl shadow-xl overflow-hidden z-50">
+
+        <button onclick="window.location.href='home.html'"
+          class="w-full px-4 py-3 text-left text-slate-700 hover:bg-slate-50 font-medium border-b">
           Go to Home
         </button>
-        <button onclick="logout()" class="w-full px-4 py-3 text-left text-red-600 hover:bg-red-50 font-medium">
+
+        <button onclick="logout()"
+          class="w-full px-4 py-3 text-left text-red-600 hover:bg-red-50 font-medium">
           Logout
         </button>
+
       </div>
+
     </div>
+
   </aside>
 
   <!-- ===== MAIN ===== -->
   <main class="lg:ml-64 flex-1 flex flex-col">
-    <div class="lg:hidden flex items-center justify-between px-4 py-4 bg-white border-b border-cyan-200/30 fixed top-0 left-0 right-0 z-20">
-      <img src="assets/graphuralogo.png" class="h-10" alt="Graphura Logo" />
+    <div class="lg:hidden flex items-center justify-between px-4 py-4 bg-gradient-to-r from-white to-orange-50/30 border-b border-orange-200/30 fixed top-0 left-0 right-0 z-20 shadow-sm">
+      <img src="assets/graphuralogo.png" class="h-10 drop-shadow-sm" alt="Graphura Logo" />
       <button class="mobile-menu-btn" onclick="openMobileSidebar()" aria-label="Toggle menu">
         <span></span>
         <span></span>
@@ -275,14 +373,18 @@
     <div class="flex-1 px-4 lg:px-10 py-6 overflow-y-auto">
 
     <!-- HEADER -->
-    <header class="mb-8 lg:mb-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 relative z-10 pt-16 lg:pt-0">
+    <header class="mb-8 lg:mb-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 relative z-10 pt-16 lg:pt-0 bg-gradient-to-r from-transparent via-orange-100/5 to-transparent rounded-2xl px-4 py-6">
       <!-- TOP ROW: MOBILE BUTTON & TITLE -->
       <div class="flex items-start gap-3 sm:gap-4">
 
         <!-- TITLE AND DESCRIPTION -->
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-3">
-            <svg class="w-8 h-8 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <div class="w-12 h-12 flex items-center justify-center">
+              <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
             <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">
               Frequently Asked Questions
             </h1>
@@ -381,17 +483,19 @@
     </section>
 
     <!-- ===== ASK A QUESTION ===== -->
-    <section class="max-w-3xl bg-white border border-cyan-200/30 rounded-2xl p-6 lg:p-8">
-      <h2 class="text-2xl lg:text-3xl font-bold text-slate-900 mb-2">Still have a question?</h2>
-      <p class="text-slate-600 mb-6">Ask us anything and our team will help you within 24 hours.</p>
+    <section class="max-w-3xl bg-gradient-to-br from-white to-orange-50/30 border-2 border-orange-200/40 rounded-2xl p-6 lg:p-8 shadow-lg hover:shadow-xl transition-all duration-300">
+      <div class="mb-6">
+        <h2 class="text-2xl lg:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-pink-600 mb-2">Still have a question?</h2>
+        <p class="text-slate-600 font-medium">Ask us anything and our team will help you within 24 hours.</p>
+      </div>
 
-      <form class="space-y-4" id="contactForm">
+      <form class="space-y-5" id="contactForm">
         <input 
           type="text" 
           id="contactName"
           placeholder="Your Name"
           required
-          class="w-full border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition"
+          class="w-full rounded-xl px-4 py-3 focus:outline-none transition text-slate-800 bg-white/80 placeholder-slate-400"
         />
 
         <input 
@@ -399,15 +503,15 @@
           id="contactEmail"
           placeholder="Your Email"
           required
-          class="w-full border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition"
+          class="w-full rounded-xl px-4 py-3 focus:outline-none transition text-slate-800 bg-white/80 placeholder-slate-400"
         />
 
         <textarea 
           id="contactMessage"
-          rows="4" 
+          rows="5" 
           placeholder="Write your question here..."
           required
-          class="w-full border border-slate-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition resize-none"
+          class="w-full rounded-xl px-4 py-3 focus:outline-none transition resize-none text-slate-800 bg-white/80 placeholder-slate-400"
         ></textarea>
 
         <div id="formMessage" class="hidden p-3 rounded-lg text-sm"></div>
@@ -450,10 +554,10 @@
     if (sidebarUserEmail) sidebarUserEmail.textContent = userEmail;
     
     // Update mobile sidebar
-    const mobileUserName = document.getElementById('mobileUserName');
-    const mobileUserEmail = document.getElementById('mobileUserEmail');
-    if (mobileUserName) mobileUserName.textContent = userName;
-    if (mobileUserEmail) mobileUserEmail.textContent = userEmail;
+    const mobileSidebarUserName = document.getElementById('mobileSidebarUserName');
+    const mobileSidebarUserEmail = document.getElementById('mobileSidebarUserEmail');
+    if (mobileSidebarUserName) mobileSidebarUserName.textContent = userName;
+    if (mobileSidebarUserEmail) mobileSidebarUserEmail.textContent = userEmail;
 
     // Initialize profile dropdowns
     initializeProfileDropdown();
