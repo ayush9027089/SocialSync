@@ -1,4 +1,4 @@
-package social_media.social_media_handler.dto.auth;
+package com.example.SocialSync.dto;
 
 
 import lombok.AllArgsConstructor;

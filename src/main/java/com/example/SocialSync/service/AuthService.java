@@ -1,4 +1,4 @@
-package social_media.social_media_handler.service;
+package com.example.SocialSync.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -8,16 +8,18 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import social_media.social_media_handler.dto.auth.LoginRequest;
-import social_media.social_media_handler.dto.auth.SignupRequest;
-import social_media.social_media_handler.dto.auth.LoginResponse;
-import social_media.social_media_handler.dto.auth.SignupResponse;
-import social_media.social_media_handler.entity.User;
-import social_media.social_media_handler.repository.UserRepository;
-import social_media.social_media_handler.service.email.EmailService;
-import social_media.social_media_handler.util.AuthEmailTemplateUtil;
-import social_media.social_media_handler.util.JwtUtil;
-import social_media.social_media_handler.util.PasswordEmailTemplateUtil;
+
+import com.example.SocialSync.dto.LoginRequest;
+import com.example.SocialSync.dto.LoginResponse;
+import com.example.SocialSync.dto.SignupRequest;
+import com.example.SocialSync.dto.SignupResponse;
+import com.example.SocialSync.model.User;
+import com.example.SocialSync.repository.UserRepository;
+import com.example.SocialSync.util.AuthEmailTemplateUtil;
+import com.example.SocialSync.util.JwtUtil;
+import com.example.SocialSync.util.PasswordEmailTemplateUtil;
+
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 @Service

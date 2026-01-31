@@ -1,4 +1,4 @@
-package social_media.social_media_handler.entity;
+package com.example.SocialSync.model;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -7,7 +7,6 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import social_media.social_media_handler.entity.youtube.YouTubeAccount;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
