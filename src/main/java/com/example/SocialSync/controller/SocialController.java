@@ -77,19 +77,19 @@ public class SocialController {
     }
 
     // ✅ NEW: 1. Get Real OAuth URL
-    @GetMapping("/auth-url")
+   @GetMapping("/auth-url")
     public ResponseEntity<?> getAuthUrl(@RequestParam String platform) {
         String url = socialAuthService.getAuthorizationUrl(platform);
         
-        // Critical: Append our JWT token as "state" so we know who is connecting
+        // Append 'state' (User ID) so we know who is logging in when they come back
         String userId = getLoggedUserId(); 
-        String state = userId; // In production, encrypt this!
         
-        url += "&state=" + state;
+        // Pinterest/LinkedIn use '&state=', but check if URL already has '?'
+        String separator = url.contains("?") ? "&" : "?";
+        url += separator + "state=" + userId;
         
         return ResponseEntity.ok(Map.of("url", url));
     }
-
     // ✅ NEW: 2. Callback Handler (Google/Facebook redirects here)
     @GetMapping("/callback/{platform}")
     public RedirectView handleCallback(
