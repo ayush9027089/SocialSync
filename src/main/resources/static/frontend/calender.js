@@ -102,7 +102,7 @@ function renderCalendar(posts = []) {
   // Empty cells
   for (let i = 0; i < firstDay; i++) {
     calendarGrid.innerHTML += `
-      <div class="bg-white/50 h-20 rounded-lg border border-cyan-200/30"></div>
+      <div class="bg-white/50 h-20 rounded-lg border border-orange-200/30"></div>
     `;
   }
 
@@ -122,13 +122,13 @@ function renderCalendar(posts = []) {
     const dayPosts = postsByDate[dateKey] || [];
 
     calendarGrid.innerHTML += `
-      <div class="bg-white/60 h-20 p-2 border border-cyan-200/50 hover:border-cyan-400/50 transition-all rounded-lg group backdrop-blur-sm">
-        <div class="text-xs font-bold text-cyan-600 mb-0.5">${day}</div>
+      <div class="bg-white/60 h-20 p-2 border border-orange-200/50 hover:border-orange-400/50 transition-all rounded-lg group backdrop-blur-sm">
+        <div class="text-xs font-bold text-orange-600 mb-0.5">${day}</div>
 
         <div class="space-y-0.5">
           ${
             dayPosts.slice(0, 2).map(post => `
-              <div class="text-[9px] px-1.5 py-0.5 rounded-sm bg-cyan-100/50 text-cyan-700 font-medium truncate border border-cyan-300/50 group-hover:bg-cyan-200/60 transition">
+              <div class="text-[9px] px-1.5 py-0.5 rounded-sm bg-orange-100/50 text-orange-700 font-medium truncate border border-orange-300/50 group-hover:bg-orange-200/60 transition">
                 ${post.platform} • ${post.content}
               </div>
             `).join("")
@@ -136,7 +136,7 @@ function renderCalendar(posts = []) {
 
           ${
             dayPosts.length > 2
-              ? `<div class="text-[8px] text-cyan-600 font-bold">
+              ? `<div class="text-[8px] text-orange-600 font-bold">
                    +${dayPosts.length - 2} more
                  </div>`
               : ""
