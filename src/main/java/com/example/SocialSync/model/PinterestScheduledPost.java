@@ -9,6 +9,7 @@ public class PinterestScheduledPost {
 @Id
 private String id;
 private String title;
+private String userId;
 private String description;
 private String boardId;
 private String imageUrl;

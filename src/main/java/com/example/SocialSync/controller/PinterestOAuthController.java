@@ -7,12 +7,17 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.SocialSync.dto.PinterestPinDTO;
 import com.example.SocialSync.model.PinterestScheduledPost;
+import com.example.SocialSync.model.User;
 import com.example.SocialSync.repository.PinterestScheduledPostRepository;
+import com.example.SocialSync.repository.UserRepository;
 import com.example.SocialSync.service.PinterestService;
 
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @RestController
 @RequestMapping("/oauth/pinterest")
@@ -22,10 +27,27 @@ public class PinterestOAuthController {
     private  PinterestService pinterestService;
     @Autowired
     private  PinterestScheduledPostRepository repository;
+    @Autowired
+    private UserRepository userRepository;
 
     // =====================
     // OAUTH FLOW
     // =====================
+    private String getLoggedUserId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = null;
+        if (auth.getPrincipal() instanceof User) {
+            email = ((User) auth.getPrincipal()).getEmail();
+        } else if (auth.getPrincipal() instanceof UserDetails) {
+            email = ((UserDetails) auth.getPrincipal()).getUsername();
+        } else {
+            email = auth.getPrincipal().toString();
+        }
+        
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"))
+                .getId();
+    }
 
     @GetMapping("/connect")
     public void connect(HttpServletResponse response) throws IOException {

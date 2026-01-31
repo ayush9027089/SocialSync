@@ -19,35 +19,34 @@ public class PinterestService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     // Fix: Ye method Scheduler call karega
-    public boolean createPin(String title, String description, String boardId, String imageUrl, String destinationLink) {
-        try {
-            String url = pinterestConfig.getBaseUrl() + "/pins";
+         public boolean createPin(String accessToken, String title, String description, String boardId, String imageUrl, String destinationLink) {
+            try {
+                String url = pinterestConfig.getBaseUrl() + "/pins";
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(pinterestConfig.getAccessToken());
-            headers.setContentType(MediaType.APPLICATION_JSON);
+                HttpHeaders headers = new HttpHeaders();
+                headers.setBearerAuth(accessToken); // ✅ Uses the dynamic token passed from Scheduler
+                headers.setContentType(MediaType.APPLICATION_JSON);
 
-            Map<String, Object> body = new HashMap<>();
-            body.put("title", title);
-            body.put("description", description);
-            body.put("board_id", boardId);
-            body.put("link", destinationLink);
+                Map<String, Object> body = new HashMap<>();
+                body.put("title", title);
+                body.put("description", description);
+                body.put("board_id", boardId);
+                body.put("link", destinationLink);
 
-            Map<String, String> mediaSource = new HashMap<>();
-            mediaSource.put("source_type", "image_url");
-            mediaSource.put("url", imageUrl);
-            body.put("media_source", mediaSource);
+                Map<String, String> mediaSource = new HashMap<>();
+                mediaSource.put("source_type", "image_url");
+                mediaSource.put("url", imageUrl);
+                body.put("media_source", mediaSource);
 
-            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
-            ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+                HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
+                ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
 
-            return response.getStatusCode() == HttpStatus.CREATED;
-        } catch (Exception e) {
-            System.err.println("Pinterest API Error: " + e.getMessage());
-            return false;
-        }
+                return response.getStatusCode() == HttpStatus.CREATED;
+            } catch (Exception e) {
+                System.err.println("Pinterest API Error: " + e.getMessage());
+                return false;
+            }
     }
-
     public String getUserAccount() {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(pinterestConfig.getAccessToken());
