@@ -7,8 +7,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Configuration file -->
-  <script src="config.js"></script>
   <style>
     body { font-family: 'Inter', sans-serif; }
     html { scroll-behavior: smooth; }
@@ -325,7 +323,23 @@
                   </div>
                   <p id="suPasswordError" class="hidden error-message text-xs text-red-500 mt-1.5 flex items-center"><i class="fas fa-exclamation-circle mr-1.5"></i></p>
                 </div>
-                
+
+                 <div class="form-group">
+                  <label class="form-label"><i class="fas fa-lock text-cyan-500 mr-2"></i>Admin</label>
+                  <div class="input-wrapper">
+                    <input id="admin" type="text" placeholder="Choose your username"
+                      class="form-input form-input-with-icon w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm outline-none">
+                  </div>
+                  <p id="suPasswordError" class="hidden error-message text-xs text-red-500 mt-1.5 flex items-center"><i class="fas fa-exclamation-circle mr-1.5"></i></p>
+                </div>
+                 <div class="form-group">
+                  <label class="form-label"><i class="fas fa-lock text-cyan-500 mr-2"></i>Secret Key</label>
+                  <div class="input-wrapper">
+                    <input id="secret" type="password" placeholder="Minimum 8 characters"
+                      class="form-input form-input-with-icon w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm outline-none">
+                  </div>
+                  <p id="suPasswordError" class="hidden error-message text-xs text-red-500 mt-1.5 flex items-center"><i class="fas fa-exclamation-circle mr-1.5"></i></p>
+                </div>
                 <button type="submit" class="btn-gradient w-full py-3 rounded-xl font-bold text-white text-sm bg-gradient-to-r from-cyan-400 to-blue-500 shadow-lg mt-4 relative group">
                   <span class="relative z-10 flex items-center justify-center gap-2">
                     <i class="fas fa-arrow-right"></i>
@@ -460,7 +474,7 @@
       }
       
       try {
-        const res = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
+        const res = await fetch('http://localhost:8082/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })
@@ -490,6 +504,8 @@
       const username = document.getElementById('suName').value.trim();
       const email = document.getElementById('suEmail').value.trim();
       const password = document.getElementById('suPassword').value;
+      const admin = document.getElementById('admin').value.trim(); 
+      const secret = document.getElementById('secret').value;
       
       // Clear errors
       document.getElementById('suNameError').classList.add('hidden');
@@ -517,29 +533,49 @@
         document.getElementById('suPasswordError').classList.remove('hidden');
         return;
       }
+      document.querySelectorAll('.text-red-500').forEach(el => el.classList.add('hidden'));
+
+      if (!username) { alert('Name is required'); return; }
+      if (!email) { alert('Email is required'); return; }
       
       try {
-        const res = await fetch(API_ENDPOINTS.AUTH.SIGNUP, {
+        const res = await fetch('http://localhost:8082/auth/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, email, password })
+          body: JSON.stringify({ username, email, password, admin, secret })
         });
         
         const result = await res.json();
         
         if (res.ok && result.success) {
-          alert('Account created! Please sign in.');
-          toggleForm();
-          document.getElementById('loginFormElement').reset();
+            alert('Account created! Please sign in.');
+            toggleForm();
+            document.getElementById('signupFormElement').reset();
         } else {
-          document.getElementById('suEmailError').textContent = result.message || 'Signup failed';
-          document.getElementById('suEmailError').classList.remove('hidden');
+            alert(result.message || 'Signup failed');
         }
-      } catch (err) {
-        document.getElementById('suEmailError').textContent = 'Backend not reachable';
-        document.getElementById('suEmailError').classList.remove('hidden');
-      }
-    });
+    } catch (err) {
+        console.error("Error:", err);
+        alert('Backend not reachable. Check if Server is running.');
+    }
+});
+
+
+    //     const result = await res.json();
+        
+    //     if (res.ok && result.success) {
+    //       alert('Account created! Please sign in.');
+    //       toggleForm();
+    //       document.getElementById('loginFormElement').reset();
+    //     } else {
+    //       document.getElementById('suEmailError').textContent = result.message || 'Signup failed';
+    //       document.getElementById('suEmailError').classList.remove('hidden');
+    //     }
+    //   } catch (err) {
+    //     document.getElementById('suEmailError').textContent = 'Backend not reachable';
+    //      document.getElementById('suEmailError').classList.remove('hidden');
+    //   }
+    // });
   </script>
 
 </body>

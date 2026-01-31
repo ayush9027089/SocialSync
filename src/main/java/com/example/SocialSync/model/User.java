@@ -1,4 +1,4 @@
-package com.example.SocialSync.model;
+package social_media.social_media_handler.entity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -7,7 +7,7 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
+import social_media.social_media_handler.entity.youtube.YouTubeAccount;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,6 +25,8 @@ private String id;
 private String username;
 private String email;
 private String password;
+private String role; // e.g., "ROLE_ADMIN" or "ROLE_USER"
+private boolean isAdmin;
 private LocalDateTime createdAt;
 private String resetToken;
 private LocalDateTime resetTokenExpiry;
@@ -42,8 +44,7 @@ account.setUser(null);
 }
 @Override
 public Collection<? extends GrantedAuthority> getAuthorities() {
-return List.of(new SimpleGrantedAuthority("ROLE_USER"));
-}
+return List.of(new SimpleGrantedAuthority(this.role != null ? this.role : "ROLE_USER"));}
 @Override
 public boolean isAccountNonExpired() {
 return true;

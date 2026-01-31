@@ -1,4 +1,4 @@
-package com.example.SocialSync.dto;
+package social_media.social_media_handler.dto.auth;
 
 
 import lombok.AllArgsConstructor;
@@ -12,4 +12,6 @@ public class SignupRequest {
     private String username;
     private String email;
     private String password;
+    private String admin;    
+    private String secret;
 }
