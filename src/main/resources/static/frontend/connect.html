@@ -624,6 +624,13 @@
           const totalEl = document.getElementById('total-active');
           if (totalEl) totalEl.innerText = activeCount;
 
+          // Persist the active platforms count so other pages can read it quickly
+          try {
+            localStorage.setItem('activePlatformsCount', String(activeCount));
+          } catch (e) {
+            console.warn('Failed to persist activePlatformsCount to localStorage', e);
+          }
+
         } else {
             console.error("Failed to fetch status");
         }
