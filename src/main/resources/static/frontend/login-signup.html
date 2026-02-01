@@ -835,7 +835,7 @@
           if (secret) payload.secretKey = secret;
         }
 
-        const res = await fetch('http://localhost:8082/auth/signup', {
+        const res = await fetch(API_ENDPOINTS.AUTH.SIGNUP, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
