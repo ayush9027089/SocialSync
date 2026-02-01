@@ -630,7 +630,7 @@
           const res = await fetch('http://localhost:8082/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password, secret })
+            body: JSON.stringify({ email, password, role: 'ADMIN', secretKey: secret })
           });
           const result = await res.json();
           loaderOverlay.classList.remove('active');
@@ -741,10 +741,10 @@
       const loaderOverlay = document.getElementById('loaderOverlay');
       try {
         loaderOverlay.classList.add('active');
-        const res = await fetch('https://localhost:8082/auth/verify-key', {
+        const res = await fetch('http://localhost:8082/auth/verify-key', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, secreteKey: otp })
+          body: JSON.stringify({ email, secretKey: otp })
         });
         const result = await res.json();
         loaderOverlay.classList.remove('active');
@@ -764,7 +764,7 @@
           const loginRes = await fetch('http://localhost:8082/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ email, password, role: 'USER' })
           });
           const loginResult = await loginRes.json();
           if (loginRes.ok && loginResult.token) {
@@ -838,7 +838,7 @@
         const payload = { email, password, role, username };
         if (isAdmin) {
           const secret = document.getElementById('suSecret') ? document.getElementById('suSecret').value : '';
-          if (secret) payload.secret = secret;
+          if (secret) payload.secretKey = secret;
         }
 
         const res = await fetch('http://localhost:8082/auth/signup', {
