@@ -322,6 +322,9 @@
 
 <body class="gradient-primary text-slate-800 min-h-screen flex flex-col m-0 p-0">
 
+  <!-- Notification root for toast-style messages -->
+  <div id="notification-root" style="position:fixed;top:1rem;right:1rem;z-index:9999;pointer-events:none"></div>
+
   <!-- CREATIVE LOADER -->
   <div id="loaderOverlay" class="loader-overlay">
     <div class="loader-container">
@@ -597,7 +600,10 @@
     });
     
     // LOGIN (enhanced)
+    let isLoginSubmitting = false;
     document.getElementById('loginFormElement').addEventListener('submit', async (e) => {
+      if (isLoginSubmitting) return;
+      isLoginSubmitting = true;
       e.preventDefault();
 
       const email = document.getElementById('liEmail').value.trim();
@@ -613,17 +619,25 @@
       if (!email) {
         document.getElementById('liEmailError').textContent = 'Email is required';
         document.getElementById('liEmailError').classList.remove('hidden');
+        isLoginSubmitting = false;
         return;
       }
       if (!password) {
         document.getElementById('liPasswordError').textContent = 'Password is required';
         document.getElementById('liPasswordError').classList.remove('hidden');
+        isLoginSubmitting = false;
         return;
       }
 
       // If admin, include secret directly and attempt login
       if (isAdmin) {
-        const secret = document.getElementById('liSecret') ? document.getElementById('liSecret').value : '';
+        const secret = document.getElementById('liSecret') ? document.getElementById('liSecret').value.trim() : '';
+        if (!secret) {
+          document.getElementById('liEmailError').textContent = 'Secret key is required for admin login';
+          document.getElementById('liEmailError').classList.remove('hidden');
+          isLoginSubmitting = false;
+          return;
+        }
         try {
           loaderOverlay.classList.add('active');
           const res = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
@@ -633,13 +647,13 @@
           });
           const result = await res.json();
           loaderOverlay.classList.remove('active');
-          if (res.ok) {
+          if (res.ok && result.token) {
             localStorage.setItem('authToken', result.token);
             localStorage.setItem('userEmail', email);
             localStorage.setItem('userName', result.username || 'User');
             window.location.href = 'main.html';
           } else {
-            document.getElementById('liEmailError').textContent = result.message || 'Invalid email or secret';
+            document.getElementById('liEmailError').textContent = result.message || 'Invalid credentials or secret key';
             document.getElementById('liEmailError').classList.remove('hidden');
           }
         } catch (err) {
@@ -672,6 +686,7 @@
         document.getElementById('liEmailError').textContent = 'Backend not reachable';
         document.getElementById('liEmailError').classList.remove('hidden');
       }
+      isLoginSubmitting = false;
     });
 
     // --- Helpers and OTP handling ---
@@ -679,9 +694,12 @@
       const cb = document.getElementById(checkboxId);
       const sd = document.getElementById(secretDivId);
       if (!cb || !sd) return;
-      cb.addEventListener('change', () => {
-        if (cb.checked) sd.classList.remove('hidden'); else sd.classList.add('hidden');
-        // let form adjust height naturally (we switched to min-h)
+      // Remove old listeners to prevent duplicates
+      const newCb = cb.cloneNode(true);
+      cb.parentNode.replaceChild(newCb, cb);
+      const newCheckbox = document.getElementById(checkboxId);
+      newCheckbox.addEventListener('change', () => {
+        if (newCheckbox.checked) sd.classList.remove('hidden'); else sd.classList.add('hidden');
       });
     }
 
@@ -709,13 +727,18 @@
       const inputs = Array.from(container.querySelectorAll('input.otp-input'));
       inputs.forEach((inp, idx) => {
         inp.value = '';
-        inp.addEventListener('input', (e) => {
-          const v = inp.value.replace(/[^0-9]/g, '');
-          inp.value = v.slice(-1);
+        // Clone to remove old listeners
+        const newInp = inp.cloneNode(true);
+        inp.parentNode.replaceChild(newInp, inp);
+        inputs[idx] = newInp;
+        
+        newInp.addEventListener('input', (e) => {
+          const v = newInp.value.replace(/[^0-9]/g, '');
+          newInp.value = v.slice(-1);
           if (v && idx < inputs.length - 1) inputs[idx + 1].focus();
         });
-        inp.addEventListener('keydown', (e) => {
-          if (e.key === 'Backspace' && !inp.value && idx > 0) {
+        newInp.addEventListener('keydown', (e) => {
+          if (e.key === 'Backspace' && !newInp.value && idx > 0) {
             inputs[idx - 1].focus();
           }
         });
@@ -771,7 +794,8 @@
           }
 
           // If verify returned success but no token and fallback failed, treat as failure
-          showNotification('error', result.message || 'Invalid secret key / credentials');
+          showNotification('error', loginResult.message || result.message || 'Invalid credentials or secret key');
+          return;
         } else {
           // Wrong secret: clear form and notify
           document.getElementById('liEmail').value = '';
@@ -779,7 +803,7 @@
           const otpInputs = overlay.querySelectorAll('.otp-input');
           otpInputs.forEach(i => i.value = '');
           overlay.classList.remove('active');
-          showNotification('error', 'you entered the wrong secrete key');
+          showNotification('error', 'You entered the wrong secret key');
         }
       } catch (err) {
         loaderOverlay.classList.remove('active');
@@ -788,12 +812,15 @@
     });
     
     // SIGNUP
+    let isSignupSubmitting = false;
     document.getElementById('signupFormElement').addEventListener('submit', async (e) => {
+      if (isSignupSubmitting) return;
+      isSignupSubmitting = true;
       e.preventDefault();
       
       const username = document.getElementById('suName').value.trim();
       const email = document.getElementById('suEmail').value.trim();
-      const password = document.getElementById('suPassword').value;
+      const password = document.getElementById('suPassword').value.trim();
       const loaderOverlay = document.getElementById('loaderOverlay');
       
       // Clear errors
@@ -805,21 +832,25 @@
       if (!username) {
         document.getElementById('suNameError').textContent = 'Username is required';
         document.getElementById('suNameError').classList.remove('hidden');
+        isSignupSubmitting = false;
         return;
       }
       if (username.length < 3) {
         document.getElementById('suNameError').textContent = 'Username must be at least 3 characters';
         document.getElementById('suNameError').classList.remove('hidden');
+        isSignupSubmitting = false;
         return;
       }
       if (!email) {
         document.getElementById('suEmailError').textContent = 'Email is required';
         document.getElementById('suEmailError').classList.remove('hidden');
+        isSignupSubmitting = false;
         return;
       }
       if (!password || password.length < 8) {
         document.getElementById('suPasswordError').textContent = 'Password must be at least 8 characters';
         document.getElementById('suPasswordError').classList.remove('hidden');
+        isSignupSubmitting = false;
         return;
       }
       
@@ -848,18 +879,37 @@
         
         if (res.ok && result.success) {
           showNotification('success', 'Account created! Please sign in.');
+          // Clear signup form
+          document.getElementById('suName').value = '';
+          document.getElementById('suEmail').value = '';
+          document.getElementById('suPassword').value = '';
+          document.getElementById('suIsAdmin').checked = false;
+          document.getElementById('suSecret').value = '';
+          document.getElementById('suSecretDiv').classList.add('hidden');
+          // Clear errors
+          document.getElementById('suNameError').classList.add('hidden');
+          document.getElementById('suEmailError').classList.add('hidden');
+          document.getElementById('suPasswordError').classList.add('hidden');
           toggleForm();
-          document.getElementById('loginFormElement').reset();
         } else {
           // If backend indicates secret/secret-key mismatch, show specific message
           const backendMsg = (result && result.message) ? String(result.message) : '';
           const backendError = result && result.error ? String(result.error) : '';
           let displayMsg = backendMsg || 'Signup failed';
           if (backendMsg.toLowerCase().includes('secret') || backendError === 'SECRET_MISMATCH' || backendMsg.toLowerCase().includes('secrete')) {
-            displayMsg = 'secrete didnt match';
+            displayMsg = 'Secret key did not match';
           }
-          document.getElementById('suEmailError').textContent = displayMsg;
-          document.getElementById('suEmailError').classList.remove('hidden');
+          // Show error in appropriate field
+          if (displayMsg.toLowerCase().includes('email')) {
+            document.getElementById('suEmailError').textContent = displayMsg;
+            document.getElementById('suEmailError').classList.remove('hidden');
+          } else if (displayMsg.toLowerCase().includes('password')) {
+            document.getElementById('suPasswordError').textContent = displayMsg;
+            document.getElementById('suPasswordError').classList.remove('hidden');
+          } else {
+            document.getElementById('suEmailError').textContent = displayMsg;
+            document.getElementById('suEmailError').classList.remove('hidden');
+          }
         }
       } catch (err) {
         // Hide loader on error
@@ -867,6 +917,7 @@
         document.getElementById('suEmailError').textContent = 'Backend not reachable';
         document.getElementById('suEmailError').classList.remove('hidden');
       }
+      isSignupSubmitting = false;
     });
   </script>
 
