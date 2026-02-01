@@ -14,10 +14,10 @@ public class DataCleanupScheduler {
 
     // ✅ Task 1: Delete Posts 10 minutes after their Scheduled Time
     // Runs every minute
-    @Scheduled(fixedRate = 60000) 
+    @Scheduled(cron = "0 0 * * * *") // Run once every hour (instead of every minute) to save resources
     public void deleteOldPosts() {
         // Calculate time: Now minus 10 minutes
-        LocalDateTime cutOffTime = LocalDateTime.now().minusMinutes(10);
+        LocalDateTime cutOffTime = LocalDateTime.now().minusDays(30);
         
         // Custom query method we will add to Repository next
         postRepository.deleteByScheduledTimeBefore(cutOffTime);
