@@ -352,7 +352,6 @@
         <input inputmode="numeric" maxlength="1" class="otp-input" />
       </div>
       <div class="otp-actions">
-        <button id="resendOtp" class="otp-resend">Resend</button>
         <button id="verifyOtp" class="otp-verify">Verify & Login</button>
       </div>
     </div>
@@ -627,7 +626,7 @@
         const secret = document.getElementById('liSecret') ? document.getElementById('liSecret').value : '';
         try {
           loaderOverlay.classList.add('active');
-          const res = await fetch('http://localhost:8082/auth/login', {
+          const res = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password, role: 'ADMIN', secretKey: secret })
@@ -654,7 +653,7 @@
       // Non-admin login: send credentials to trigger secret-send, then show OTP card
       try {
         loaderOverlay.classList.add('active');
-        const res = await fetch('http://localhost:8082/auth/login', {
+        const res = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password, role: 'USER' })
@@ -724,11 +723,6 @@
       inputs[0].focus();
     }
 
-    document.getElementById('resendOtp')?.addEventListener('click', async (e) => {
-      // simple visual feedback for resend (real resend requires backend)
-      showNotification('success', 'Secret key resent to your email');
-    });
-
     document.getElementById('verifyOtp')?.addEventListener('click', async (e) => {
       const overlay = document.getElementById('otpOverlay');
       if (!overlay) return;
@@ -741,7 +735,7 @@
       const loaderOverlay = document.getElementById('loaderOverlay');
       try {
         loaderOverlay.classList.add('active');
-        const res = await fetch('http://localhost:8082/auth/verify-key', {
+        const res = await fetch(API_ENDPOINTS.AUTH.VERIFY_KEY, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, secretKey: otp })
@@ -761,7 +755,7 @@
 
           // Fallback: exchange credentials for token
           const password = document.getElementById('liPassword').value;
-          const loginRes = await fetch('http://localhost:8082/auth/login', {
+          const loginRes = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password, role: 'USER' })

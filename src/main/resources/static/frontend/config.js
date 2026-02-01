@@ -13,6 +13,7 @@ const API_ENDPOINTS = {
   AUTH: {
     LOGIN: `${API_BASE_URL}/auth/login`,
     SIGNUP: `${API_BASE_URL}/auth/signup`
+    ,VERIFY_KEY: `${API_BASE_URL}/auth/verify-key`
   },
   
   // Posts endpoints
