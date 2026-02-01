@@ -505,8 +505,11 @@
 <script>
   // ===== AUTHENTICATION CHECK =====
   
+  console.log('analysis: inline script loaded');
+
   window.onload = () => {
     const token = localStorage.getItem("authToken");
+    console.log('analysis: window.onload, authToken present?:', !!token);
     if (!token) window.location.href = "home.html";
 
     const userEmail = localStorage.getItem("userEmail") || "";
@@ -619,6 +622,19 @@
     }
   });
 
+  // Listen for cross-tab updates to activePlatformsCount
+  window.addEventListener('storage', (e) => {
+    try {
+      if (e.key === 'activePlatformsCount') {
+        console.log('storage event: activePlatformsCount changed ->', e.newValue);
+        const el = document.getElementById('activePlatformsCount');
+        if (el) el.textContent = e.newValue !== null ? String(Number(e.newValue) || 0) : '0';
+      }
+    } catch (err) {
+      console.warn('Error handling storage event for activePlatformsCount', err);
+    }
+  });
+
 async function initializeAnalytics() {
   try {
     showLoading(true);
@@ -722,9 +738,10 @@ async function initializeAnalytics() {
    */
   async function updateConnectedPlatforms() {
     try {
-      
+      console.log('updateConnectedPlatforms: called');
       try {
         const cached = localStorage.getItem('activePlatformsCount');
+        console.log('updateConnectedPlatforms: cached raw value =', cached);
         const el = document.getElementById('activePlatformsCount');
         if (el) {
           el.textContent = cached !== null ? String(Number(cached) || 0) : '0';
@@ -1003,9 +1020,9 @@ async function initializeAnalytics() {
     try {
       const cached = localStorage.getItem('activePlatformsCount');
       const activeEl = document.getElementById('activePlatformsCount');
+      console.log(cached);
       if (activeEl) {
         if (cached !== null) {
-          console.log(cached);
           activeEl.textContent = String(Number(cached) || 0);
         } else {
           activeEl.textContent = '0';

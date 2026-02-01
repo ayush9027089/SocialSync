@@ -627,6 +627,7 @@
           // Persist the active platforms count so other pages can read it quickly
           try {
             localStorage.setItem('activePlatformsCount', String(activeCount));
+            console.log('connect.html: persisted activePlatformsCount =', String(activeCount));
           } catch (e) {
             console.warn('Failed to persist activePlatformsCount to localStorage', e);
           }
