@@ -742,9 +742,12 @@ async function initializeAnalytics() {
       try {
         const cached = localStorage.getItem('activePlatformsCount');
         console.log('updateConnectedPlatforms: cached raw value =', cached);
+        const parsed = cached !== null ? Number(cached) : 0;
+        console.log('updateConnectedPlatforms: parsed value =', parsed);
         const el = document.getElementById('activePlatformsCount');
         if (el) {
-          el.textContent = cached !== null ? String(Number(cached) || 0) : '0';
+          el.textContent = String(parsed || 0);
+          console.log('updateConnectedPlatforms: DOM updated activePlatformsCount =', el.textContent);
         }
       } catch (e) {
         console.warn('Could not read activePlatformsCount from localStorage', e);
@@ -1020,13 +1023,12 @@ async function initializeAnalytics() {
     try {
       const cached = localStorage.getItem('activePlatformsCount');
       const activeEl = document.getElementById('activePlatformsCount');
-      console.log(cached);
+      console.log('updateStatisticsEmpty: cached raw value =', cached);
+      const parsedEmpty = cached !== null ? Number(cached) : 0;
+      console.log('updateStatisticsEmpty: parsed value =', parsedEmpty);
       if (activeEl) {
-        if (cached !== null) {
-          activeEl.textContent = String(Number(cached) || 0);
-        } else {
-          activeEl.textContent = '0';
-        }
+        activeEl.textContent = String(parsedEmpty || 0);
+        console.log('updateStatisticsEmpty: DOM updated activePlatformsCount =', activeEl.textContent);
       }
     } catch (e) {
       const activeEl = document.getElementById('activePlatformsCount');
