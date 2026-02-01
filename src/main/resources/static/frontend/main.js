@@ -22,8 +22,14 @@ function switchTab(tabName, evt) {
 }
 
 // LOGOUT FUNCTION
-function logout() {
-  if (confirm('Are you sure you want to logout?')) {
+async function logout() {
+  let ok;
+  if (typeof showConfirm === 'function') {
+    ok = await showConfirm('Are you sure you want to logout?');
+  } else {
+    ok = confirm('Are you sure you want to logout?');
+  }
+  if (ok) {
     localStorage.removeItem('authToken');
     localStorage.removeItem('userEmail');
     localStorage.removeItem('userName');
