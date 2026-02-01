@@ -307,6 +307,9 @@
 
 <body class="bg-white text-slate-800 min-h-screen">
 
+<!-- Notification root for toast cards -->
+<div id="notification-root" aria-live="polite" class="fixed top-6 right-6 z-50"></div>
+
 <!-- MOBILE SIDEBAR OVERLAY -->
 <div id="mobileSidebarOverlay" class="mobile-sidebar-overlay" onclick="closeMobileSidebar()"></div>
 
@@ -831,9 +834,17 @@ function getComputedStatus(post) {
     sidebarProfileMenu.classList.add("hidden");
   });
 
-  function logout() {
-    localStorage.clear();
-    window.location.href = "home.html";
+  async function logout() {
+    let ok;
+    if (typeof showConfirm === 'function') {
+      ok = await showConfirm('Are you sure you want to logout?');
+    } else {
+      ok = confirm('Are you sure you want to logout?');
+    }
+    if (ok) {
+      localStorage.clear();
+      window.location.href = "home.html";
+    }
   }
 
   window.onload = () => {
@@ -934,18 +945,18 @@ document.getElementById('scheduleForm').addEventListener('submit', async (e) => 
         });
 
         if (response.ok) {
-            alert("✅ Post scheduled successfully!");
-            closeModal();
-            // Clear the temporary media URL
-            window.uploadedMediaUrl = null;
-            loadPosts(); // UI refresh karne ke liye
+          showNotification('success', '✅ Post scheduled successfully!');
+          closeModal();
+          // Clear the temporary media URL
+          window.uploadedMediaUrl = null;
+          loadPosts(); // UI refresh karne ke liye
         } else {
-            const errorData = await response.json();
-            alert("❌ Error: " + (errorData.message || "Failed to schedule post"));
+          const errorData = await response.json();
+          showNotification('error', '❌ Error: ' + (errorData.message || 'Failed to schedule post'));
         }
     } catch (error) {
-        console.error("Error sending data:", error);
-        alert("Server se connection fail ho gaya.");
+      console.error("Error sending data:", error);
+      showNotification('error', 'Server se connection fail ho gaya.');
     }
 });
 
@@ -1454,9 +1465,8 @@ function closePostDetailsModal() {
 
 // Delete post from card
 async function deletePost(postId) {
-    if (!confirm('Are you sure you want to delete this scheduled post?')) {
-        return;
-    }
+    const ok = await showConfirm('Are you sure you want to delete this scheduled post?');
+    if (!ok) return;
 
     try {
         const response = await fetch(API_ENDPOINTS.POSTS.GET_BY_ID(postId), {
@@ -1468,15 +1478,15 @@ async function deletePost(postId) {
         });
 
         if (response.ok) {
-            alert('✅ Post deleted successfully!');
-            loadPosts(); // Refresh the list
+          showNotification('success', '✅ Post deleted successfully!');
+          loadPosts(); // Refresh the list
         } else {
-            const errorData = await response.json();
-            alert('❌ Error: ' + (errorData.message || 'Failed to delete post'));
+          const errorData = await response.json();
+          showNotification('error', '❌ Error: ' + (errorData.message || 'Failed to delete post'));
         }
     } catch (error) {
-        console.error('Error deleting post:', error);
-        alert('❌ Error deleting post. Please try again.');
+      console.error('Error deleting post:', error);
+      showNotification('error', '❌ Error deleting post. Please try again.');
     }
 }
 
@@ -1484,9 +1494,8 @@ async function deletePost(postId) {
 async function deletePostFromModal() {
     if (!currentPost) return;
     
-    if (!confirm('Are you sure you want to delete this scheduled post?')) {
-        return;
-    }
+    const ok = await showConfirm('Are you sure you want to delete this scheduled post?');
+    if (!ok) return;
 
     try {
         const response = await fetch(API_ENDPOINTS.POSTS.UPDATE(currentPost.id), {
@@ -1498,16 +1507,16 @@ async function deletePostFromModal() {
         });
 
         if (response.ok) {
-            alert('✅ Post deleted successfully!');
-            closePostDetailsModal();
-            loadPosts(); // Refresh the list
+          showNotification('success', '✅ Post deleted successfully!');
+          closePostDetailsModal();
+          loadPosts(); // Refresh the list
         } else {
-            const errorData = await response.json();
-            alert('❌ Error: ' + (errorData.message || 'Failed to delete post'));
+          const errorData = await response.json();
+          showNotification('error', '❌ Error: ' + (errorData.message || 'Failed to delete post'));
         }
     } catch (error) {
-        console.error('Error deleting post:', error);
-        alert('❌ Error deleting post. Please try again.');
+      console.error('Error deleting post:', error);
+      showNotification('error', '❌ Error deleting post. Please try again.');
     }
 }
 
@@ -1552,7 +1561,116 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
+// Notification utility (replaces alert())
+function _injectNotificationStyles() {
+  if (document.getElementById('notif-styles')) return;
+  const css = `
+  #notification-root { display:flex; flex-direction:column; gap:10px; }
+  .notif-card{min-width:280px;max-width:360px;padding:14px 16px;border-radius:12px;box-shadow:0 10px 30px rgba(2,6,23,0.08);display:flex;align-items:flex-start;gap:12px;border:1px solid rgba(2,6,23,0.04);font-family:Inter,system-ui,Arial}
+  .notif-card strong{display:block;font-weight:700;color:#0f172a}
+  .notif-success{background:linear-gradient(180deg,#ecfdf5,#f0fdf4);border-color:rgba(16,185,129,0.08);}
+  .notif-error{background:linear-gradient(180deg,#fff1f0,#fff7f5);border-color:rgba(239,68,68,0.06);}
+  .notif-icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex-shrink:0}
+  .notif-success .notif-icon{background:linear-gradient(90deg,#10b981,#059669);color:#fff}
+  .notif-error .notif-icon{background:linear-gradient(90deg,#fb7185,#f97316);color:#fff}
+  .notif-body{flex:1;color:#0f172a;font-size:14px}
+  .notif-close{margin-left:8px;background:transparent;border:none;color:rgba(15,23,42,0.6);cursor:pointer;padding:6px;border-radius:8px}
+  .notif-enter{animation:notifIn .28s cubic-bezier(.2,.9,.2,1)}
+  .notif-leave{animation:notifOut .28s ease forwards}
+  @keyframes notifIn{from{transform:translateY(-8px);opacity:0}to{transform:translateY(0);opacity:1}}
+  @keyframes notifOut{to{transform:translateY(-12px);opacity:0;height:0;margin:0;padding:0}}
+  `;
+  const s = document.createElement('style'); s.id = 'notif-styles'; s.innerHTML = css; document.head.appendChild(s);
+}
+
+function showNotification(type, message, timeout = 4500) {
+  _injectNotificationStyles();
+  const root = document.getElementById('notification-root');
+  if (!root) return alert(message);
+
+  const card = document.createElement('div');
+  card.className = 'notif-card notif-' + (type === 'error' ? 'error' : 'success') + ' notif-enter';
+
+  const icon = document.createElement('div'); icon.className = 'notif-icon';
+  icon.innerHTML = type === 'error' ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 9v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 17h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.29 3.86L1.82 18.35A2 2 0 0 0 3.6 21h16.8a2 2 0 0 0 1.78-2.65L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="none" fill="currentColor"/></svg>' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  const body = document.createElement('div'); body.className = 'notif-body';
+  body.innerHTML = `<div>${message}</div>`;
+
+  const closeBtn = document.createElement('button'); closeBtn.className = 'notif-close'; closeBtn.innerHTML = '&#10005;';
+  closeBtn.onclick = () => { card.classList.add('notif-leave'); setTimeout(() => card.remove(), 300); };
+
+  card.appendChild(icon); card.appendChild(body); card.appendChild(closeBtn);
+  root.prepend(card);
+
+  const t = setTimeout(() => { if (card.parentElement) { card.classList.add('notif-leave'); setTimeout(() => card.remove(), 300); } }, timeout);
+
+  return { element: card, close: () => { clearTimeout(t); if (card.parentElement) { card.remove(); } } };
+}
+
 </script>
 
 </body>
 </html>
+
+<!-- Confirmation card helper (appended) -->
+<div id="confirm-root" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:10000;pointer-events:auto">
+  <div id="confirm-backdrop" style="position:absolute;inset:0;background:rgba(2,6,23,0.45);"></div>
+  <div id="confirm-card" style="position:relative;min-width:320px;max-width:520px;background:white;border-radius:14px;padding:20px 18px;box-shadow:0 20px 50px rgba(2,6,23,0.18);display:flex;flex-direction:column;gap:12px;z-index:10001;font-family:Inter,system-ui,Arial">
+    <div style="display:flex;gap:12px;align-items:flex-start">
+      <div style="width:44px;height:44px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(90deg,#fb7185,#f97316);color:#fff">?</div>
+      <div style="flex:1">
+        <div id="confirm-title" style="font-weight:700;color:#0f172a;font-size:16px">Confirm action</div>
+        <div id="confirm-message" style="color:#475569;font-size:14px;margin-top:6px">Are you sure?</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:6px">
+      <button id="confirm-cancel" style="background:#fff;border:1px solid rgba(2,6,23,0.06);padding:8px 12px;border-radius:10px;color:#0f172a;">Cancel</button>
+      <button id="confirm-accept" style="background:linear-gradient(90deg,#10b981,#059669);color:#fff;padding:8px 12px;border-radius:10px;border:1px solid rgba(6,95,70,0.08);">Yes, delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // showConfirm(message) -> Promise<boolean>
+  function showConfirm(message, options = {}) {
+    return new Promise((resolve) => {
+      const root = document.getElementById('confirm-root');
+      const msgEl = document.getElementById('confirm-message');
+      const acceptBtn = document.getElementById('confirm-accept');
+      const cancelBtn = document.getElementById('confirm-cancel');
+      const backdrop = document.getElementById('confirm-backdrop');
+
+      if (!root || !msgEl || !acceptBtn || !cancelBtn) {
+        // fallback to window.confirm
+        resolve(window.confirm(message));
+        return;
+      }
+
+      msgEl.textContent = message;
+      root.style.display = 'flex';
+
+      const cleanup = () => {
+        acceptBtn.onclick = null;
+        cancelBtn.onclick = null;
+        backdrop.onclick = null;
+        root.style.display = 'none';
+      };
+
+      acceptBtn.onclick = () => {
+        cleanup();
+        resolve(true);
+      };
+
+      cancelBtn.onclick = () => {
+        cleanup();
+        resolve(false);
+      };
+
+      backdrop.onclick = () => {
+        cleanup();
+        resolve(false);
+      };
+    });
+  }
+</script>
