@@ -342,8 +342,9 @@
           <div>
             <h1 class="text-5xl font-extrabold mb-4 leading-tight">
               <span class="text-slate-900">Welcome</span><br>
-              <span class="inline-block"><span class="gradient-text">Back to Graphura</span></span>
             </h1>
+          <!-- Notification root for toast-style messages -->
+          <div id="notification-root" style="position:fixed;top:1rem;right:1rem;z-index:9999;pointer-events:none"></div>
             <p class="text-lg text-slate-600 max-w-md leading-relaxed font-medium">
               Seamlessly manage all your social media accounts, schedule posts in advance, and track your performance—all from one powerful dashboard.
             </p>
@@ -626,7 +627,7 @@
         loaderOverlay.classList.remove('active');
         
         if (res.ok && result.success) {
-          alert('Account created! Please sign in.');
+          showNotification('success', 'Account created! Please sign in.');
           toggleForm();
           document.getElementById('loginFormElement').reset();
         } else {
@@ -642,5 +643,53 @@
     });
   </script>
 
+<script>
+  // Notification utility (copied from main.html)
+  function _injectNotificationStyles() {
+    if (document.getElementById('notif-styles')) return;
+    const css = `
+    #notification-root { display:flex; flex-direction:column; gap:10px; pointer-events:none }
+    .notif-card{min-width:280px;max-width:360px;padding:14px 16px;border-radius:12px;box-shadow:0 10px 30px rgba(2,6,23,0.08);display:flex;align-items:flex-start;gap:12px;border:1px solid rgba(2,6,23,0.04);font-family:Inter,system-ui,Arial}
+    .notif-card strong{display:block;font-weight:700;color:#0f172a}
+    .notif-success{background:linear-gradient(180deg,#ecfdf5,#f0fdf4);border-color:rgba(16,185,129,0.08);}
+    .notif-error{background:linear-gradient(180deg,#fff1f0,#fff7f5);border-color:rgba(239,68,68,0.06);}
+    .notif-icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex-shrink:0}
+    .notif-success .notif-icon{background:linear-gradient(90deg,#10b981,#059669);color:#fff}
+    .notif-error .notif-icon{background:linear-gradient(90deg,#fb7185,#f97316);color:#fff}
+    .notif-body{flex:1;color:#0f172a;font-size:14px}
+    .notif-close{margin-left:8px;background:transparent;border:none;color:rgba(15,23,42,0.6);cursor:pointer;padding:6px;border-radius:8px}
+    .notif-enter{animation:notifIn .28s cubic-bezier(.2,.9,.2,1)}
+    .notif-leave{animation:notifOut .28s ease forwards}
+    @keyframes notifIn{from{transform:translateY(-8px);opacity:0}to{transform:translateY(0);opacity:1}}
+    @keyframes notifOut{to{transform:translateY(-12px);opacity:0;height:0;margin:0;padding:0}}
+    `;
+    const s = document.createElement('style'); s.id = 'notif-styles'; s.innerHTML = css; document.head.appendChild(s);
+  }
+
+  function showNotification(type, message, timeout = 4500) {
+    _injectNotificationStyles();
+    const root = document.getElementById('notification-root');
+    if (!root) return alert(message);
+
+    const card = document.createElement('div');
+    card.className = 'notif-card notif-' + (type === 'error' ? 'error' : 'success') + ' notif-enter';
+
+    const icon = document.createElement('div'); icon.className = 'notif-icon';
+    icon.innerHTML = type === 'error' ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 9v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 17h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.29 3.86L1.82 18.35A2 2 0 0 0 3.6 21h16.8a2 2 0 0 0 1.78-2.65L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="none" fill="currentColor"/></svg>' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+    const body = document.createElement('div'); body.className = 'notif-body';
+    body.innerHTML = `<div>${message}</div>`;
+
+    const closeBtn = document.createElement('button'); closeBtn.className = 'notif-close'; closeBtn.innerHTML = '&#10005;';
+    closeBtn.onclick = () => { card.classList.add('notif-leave'); setTimeout(() => card.remove(), 300); };
+
+    card.appendChild(icon); card.appendChild(body); card.appendChild(closeBtn);
+    root.prepend(card);
+
+    const t = setTimeout(() => { if (card.parentElement) { card.classList.add('notif-leave'); setTimeout(() => card.remove(), 300); } }, timeout);
+
+    return { element: card, close: () => { clearTimeout(t); if (card.parentElement) { card.remove(); } } };
+  }
+</script>
 </body>
 </html>
