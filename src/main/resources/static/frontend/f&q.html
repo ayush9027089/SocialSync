@@ -125,12 +125,12 @@
     }
     .faq-question {
       cursor: pointer;
-      padding: 0.875rem 1.125rem;
+      padding: 0.75rem 1rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: #1e293b;
       transition: all 0.3s ease;
       user-select: none;
@@ -144,7 +144,8 @@
       color: #f97316;
       background: linear-gradient(90deg, rgba(249,115,22,0.04) 0%, rgba(249,115,22,0.08) 100%);
     }
-    .faq-question span {
+    /* Indicator (plus/minus) */
+    .faq-question span:last-child {
       font-size: 1.2rem;
       color: #f97316;
       flex-shrink: 0;
@@ -154,15 +155,24 @@
       align-items: center;
       justify-content: center;
     }
+
+    /* Question text: ensure it starts from the left (does not center) */
+    .faq-question .flex-1 {
+      display: block;
+      text-align: left;
+      color: inherit;
+      font-size: 0.95rem;
+      line-height: 1.2;
+    }
     .faq-item.open .faq-question span {
       color: #ec4899;
     }
     .faq-answer {
-      padding: 0 1.125rem 0.875rem;
+      padding: 0 1rem 0.65rem;
       display: none;
       color: #475569;
-      font-size: 0.85rem;
-      line-height: 1.5;
+      font-size: 0.8rem;
+      line-height: 1.45;
       animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       background: linear-gradient(90deg, rgba(249,115,22,0.02) 0%, rgba(249,115,22,0.01) 100%);
     }
@@ -373,7 +383,7 @@
     <div class="flex-1 px-4 lg:px-10 py-6 overflow-y-auto">
 
     <!-- HEADER -->
-    <header class="mb-8 lg:mb-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 relative z-10 pt-16 lg:pt-0 bg-gradient-to-r from-transparent via-orange-100/5 to-transparent rounded-2xl px-4 py-6">
+    <header class="mb-4 lg:mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 relative z-10 pt-12 lg:pt-0 bg-gradient-to-r from-transparent via-orange-100/5 to-transparent rounded-2xl px-4 py-4">
       <!-- TOP ROW: MOBILE BUTTON & TITLE -->
       <div class="flex items-start gap-3 sm:gap-4">
 
@@ -396,8 +406,9 @@
       </div>
     </header>
 
+    <div class="mt-2 lg:mt-3 grid grid-cols-1 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] gap-6 lg:gap-8 items-start">
     <!-- ===== FAQ SECTION ===== -->
-    <section class="space-y-2 max-w-3xl mb-12">
+    <section class="space-y-2">
 
       <!-- FAQ ITEM -->
       <div class="faq-item">
@@ -483,7 +494,7 @@
     </section>
 
     <!-- ===== ASK A QUESTION ===== -->
-    <section class="max-w-3xl bg-gradient-to-br from-white to-orange-50/30 border-2 border-orange-200/40 rounded-2xl p-6 lg:p-8 shadow-lg hover:shadow-xl transition-all duration-300">
+    <section class="lg:sticky lg:top-24 bg-gradient-to-br from-white to-orange-50/30 border-2 border-orange-200/40 rounded-2xl p-6 lg:p-8 shadow-lg hover:shadow-xl transition-all duration-300">
       <div class="mb-6">
         <h2 class="text-2xl lg:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-pink-600 mb-2">Still have a question?</h2>
         <p class="text-slate-600 font-medium">Ask us anything and our team will help you within 24 hours.</p>
@@ -524,6 +535,7 @@
         </button>
       </form>
     </section>
+    </div>
 
     </div>
   </main>
