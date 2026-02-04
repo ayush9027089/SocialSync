@@ -1,14 +1,19 @@
 package com.example.SocialSync.controller;
 
+import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.SocialSync.dto.ContactFormRequest;
+import com.example.SocialSync.model.ContactQuestion;
+import com.example.SocialSync.repository.ContactQuestionRepository;
 import com.example.SocialSync.service.EmailService;
 
 import lombok.RequiredArgsConstructor;
@@ -16,12 +21,26 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/contact")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class ContactController {
 
     private final EmailService emailService;
+    private final ContactQuestionRepository questionRepository;
 
     @PostMapping("/faq")
     public ResponseEntity<?> submitQuestion(@RequestBody ContactFormRequest request) {
+
+        // 1. Save to Database
+        ContactQuestion question = ContactQuestion.builder()
+                .id(UUID.randomUUID().toString())
+                .name(request.getName())
+                .email(request.getEmail())
+                .message(request.getMessage())
+                .source(request.getSource())
+                .submittedAt(LocalDateTime.now())
+                .build();
+
+        questionRepository.save(question);
         
         // 1. Send Email to Admin (Support Team)
         String adminSubject = "New Question from " + request.getName();
