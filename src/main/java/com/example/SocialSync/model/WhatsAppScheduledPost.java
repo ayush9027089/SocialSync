@@ -10,7 +10,7 @@ public class WhatsAppScheduledPost {
     @Id
     private String id;
     private String userId;
-    private String platform; // "WHATSAPP", "INSTAGRAM", "FACEBOOK", "LINKEDIN", "X" [cite: 144]
+    private String platform; // "WHATSAPP", "INSTAGRAM", "FACEBOOK", "LINKEDIN", "X" 
     private String recipient; // Phone number or Social Media ID
     private String content; // Post ya message
     private LocalDateTime scheduledTime;
