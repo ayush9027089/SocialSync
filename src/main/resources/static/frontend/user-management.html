@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Graphura – User Management</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="config.js"></script>
 
   <style>
     /* ===== SIDEBAR ===== */
@@ -520,9 +521,9 @@
                 <th class="px-6 py-4 text-center text-xs font-bold text-slate-600 uppercase tracking-wider">
                   <div class="flex items-center justify-center gap-1">
                     <svg class="w-4 h-4 text-orange-600" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M19 13H5v-2h14v2z"/>
+                      <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                    Posts
+                    Last Active
                   </div>
                 </th>
                 <th class="px-6 py-4 text-center text-xs font-bold text-slate-600 uppercase tracking-wider">
@@ -530,7 +531,7 @@
                     <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.658 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
                     </svg>
-                    Platforms
+                    YouTube Connected
                   </div>
                 </th>
                 <th class="px-6 py-4 text-center text-xs font-bold text-slate-600 uppercase tracking-wider">
@@ -652,20 +653,20 @@
           <div class="card-glass rounded-xl p-4 text-center">
             <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-orange-100 mx-auto mb-2">
               <svg class="w-5 h-5 text-orange-600" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M19 13H5v-2h14v2z"/>
+                <path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.658 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
               </svg>
             </div>
-            <p class="text-xs text-slate-600 mb-1">Posts</p>
-            <p id="modalPostsCount" class="text-2xl font-bold text-orange-600">0</p>
+            <p class="text-xs text-slate-600 mb-1">YouTube Connections</p>
+            <p id="modalConnectedAccounts" class="text-2xl font-bold text-orange-600">0</p>
           </div>
           <div class="card-glass rounded-xl p-4 text-center">
             <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-100 mx-auto mb-2">
               <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.658 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
             </div>
-            <p class="text-xs text-slate-600 mb-1">Platforms</p>
-            <p id="modalPlatformsCount" class="text-2xl font-bold text-blue-600">0</p>
+            <p class="text-xs text-slate-600 mb-1">Last Active</p>
+            <p id="modalLastActiveSummary" class="text-lg font-bold text-blue-600">Never</p>
           </div>
         </div>
       </div>
@@ -743,6 +744,87 @@
   let currentUserModal = null;
   const avatarClasses = ['avatar-1', 'avatar-2', 'avatar-3', 'avatar-4', 'avatar-5', 'avatar-6'];
 
+  const USER_API_BASE = (typeof API_BASE_URL !== 'undefined' && API_BASE_URL)
+    ? API_BASE_URL
+    : 'http://localhost:8082';
+
+  const USER_ENDPOINTS = {
+    ALL: `${USER_API_BASE}/api/users/all`
+  };
+
+  function parseDate(value) {
+    if (!value) return null;
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  function formatDateShort(date) {
+    if (!date) return '—';
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
+  }
+
+  function formatDateLong(date) {
+    if (!date) return '—';
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  function formatDateTime(date) {
+    if (!date) return 'Never';
+    return date.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  }
+
+  function formatRelativeTime(date) {
+    if (!date) return 'Never';
+    const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+    if (seconds < 60) return 'Just now';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 30) return `${days}d ago`;
+    const months = Math.floor(days / 30);
+    if (months < 12) return `${months}mo ago`;
+    const years = Math.floor(months / 12);
+    return `${years}y ago`;
+  }
+
+  function buildUserViewModel(user, index) {
+    const createdAt = parseDate(user.createdAt);
+    const lastActiveAt = parseDate(user.lastActiveAt);
+    const status = String(user.status || '').toLowerCase() === 'active' ? 'Active' : 'Inactive';
+    const isActive = status === 'Active';
+    const fallbackName = user.email ? user.email.split('@')[0] : 'Unknown';
+    const displayName = user.username || user.userName || user.name || fallbackName;
+    const username = user.username || user.userName || displayName;
+    const connectedAccountsCount = Number(user.connectedAccountsCount || 0);
+    const roleLabel = user.role ? user.role.replace('ROLE_', '') : 'USER';
+
+    return {
+      id: user.id,
+      name: displayName || 'Unknown',
+      username: username || 'user',
+      email: user.email || '—',
+      role: roleLabel,
+      createdAt,
+      joinedLabel: formatDateShort(createdAt),
+      lastActiveAt,
+      lastActiveLabel: formatRelativeTime(lastActiveAt),
+      lastActiveFull: formatDateTime(lastActiveAt),
+      status,
+      isActive,
+      connectedAccountsCount,
+      avatarClass: avatarClasses[index % avatarClasses.length],
+      avatarInitial: (displayName || username || 'U').charAt(0).toUpperCase()
+    };
+  }
+
+  function sortUsers(a, b) {
+    const aDate = a.lastActiveAt || a.createdAt || new Date(0);
+    const bDate = b.lastActiveAt || b.createdAt || new Date(0);
+    return bDate - aDate;
+  }
+
   // ===== DUMMY DATA =====
   function getDummyUsers() {
     return [
@@ -752,13 +834,10 @@
         email: 'sarah.johnson@email.com',
         username: 'sarahjohnson',
         role: 'USER',
-        createdAt: '2024-01-15',
-        lastLogin: '2024-02-04',
-        isActive: true,
-        postsCount: 42,
-        platformsCount: 4,
-        avatarClass: avatarClasses[0],
-        avatarInitial: 'S'
+        createdAt: '2024-01-15T10:12:00',
+        lastActiveAt: '2024-02-04T09:10:00',
+        status: 'Active',
+        connectedAccountsCount: 4
       },
       {
         id: '2',
@@ -766,13 +845,10 @@
         email: 'michael.chen@email.com',
         username: 'mikechen92',
         role: 'USER',
-        createdAt: '2023-11-20',
-        lastLogin: '2024-02-03',
-        isActive: true,
-        postsCount: 28,
-        platformsCount: 3,
-        avatarClass: avatarClasses[1],
-        avatarInitial: 'M'
+        createdAt: '2023-11-20T14:45:00',
+        lastActiveAt: '2024-02-03T18:32:00',
+        status: 'Active',
+        connectedAccountsCount: 3
       },
       {
         id: '3',
@@ -780,13 +856,10 @@
         email: 'emily.rodriguez@email.com',
         username: 'emilyrodriguez',
         role: 'USER',
-        createdAt: '2024-02-01',
-        lastLogin: '2024-02-04',
-        isActive: true,
-        postsCount: 15,
-        platformsCount: 5,
-        avatarClass: avatarClasses[2],
-        avatarInitial: 'E'
+        createdAt: '2024-02-01T09:05:00',
+        lastActiveAt: '2024-02-04T07:20:00',
+        status: 'Active',
+        connectedAccountsCount: 5
       },
       {
         id: '4',
@@ -794,13 +867,10 @@
         email: 'david.thompson@email.com',
         username: 'davethompson',
         role: 'USER',
-        createdAt: '2023-10-10',
-        lastLogin: '2024-01-28',
-        isActive: false,
-        postsCount: 35,
-        platformsCount: 4,
-        avatarClass: avatarClasses[3],
-        avatarInitial: 'D'
+        createdAt: '2023-10-10T11:30:00',
+        lastActiveAt: '2024-01-28T12:10:00',
+        status: 'Inactive',
+        connectedAccountsCount: 2
       },
       {
         id: '5',
@@ -808,13 +878,10 @@
         email: 'jessica.lee@email.com',
         username: 'jessicalee21',
         role: 'USER',
-        createdAt: '2024-01-02',
-        lastLogin: '2024-02-04',
-        isActive: true,
-        postsCount: 56,
-        platformsCount: 4,
-        avatarClass: avatarClasses[4],
-        avatarInitial: 'J'
+        createdAt: '2024-01-02T08:15:00',
+        lastActiveAt: '2024-02-04T11:05:00',
+        status: 'Active',
+        connectedAccountsCount: 4
       },
       {
         id: '6',
@@ -822,13 +889,10 @@
         email: 'james.wilson@email.com',
         username: 'jameswilson88',
         role: 'USER',
-        createdAt: '2023-12-12',
-        lastLogin: '2024-02-02',
-        isActive: true,
-        postsCount: 22,
-        platformsCount: 3,
-        avatarClass: avatarClasses[5],
-        avatarInitial: 'J'
+        createdAt: '2023-12-12T16:20:00',
+        lastActiveAt: '2024-02-02T10:40:00',
+        status: 'Active',
+        connectedAccountsCount: 3
       },
       {
         id: '7',
@@ -836,13 +900,10 @@
         email: 'amanda.martinez@email.com',
         username: 'amandamartinez',
         role: 'USER',
-        createdAt: '2024-01-18',
-        lastLogin: '2024-02-04',
-        isActive: true,
-        postsCount: 33,
-        platformsCount: 4,
-        avatarClass: avatarClasses[0],
-        avatarInitial: 'A'
+        createdAt: '2024-01-18T12:00:00',
+        lastActiveAt: '2024-02-04T13:10:00',
+        status: 'Active',
+        connectedAccountsCount: 4
       },
       {
         id: '8',
@@ -850,13 +911,10 @@
         email: 'robert.garcia@email.com',
         username: 'robertgarcia',
         role: 'USER',
-        createdAt: '2023-09-05',
-        lastLogin: '2024-01-20',
-        isActive: false,
-        postsCount: 48,
-        platformsCount: 5,
-        avatarClass: avatarClasses[1],
-        avatarInitial: 'R'
+        createdAt: '2023-09-05T09:45:00',
+        lastActiveAt: '2024-01-20T18:25:00',
+        status: 'Inactive',
+        connectedAccountsCount: 1
       },
       {
         id: '9',
@@ -864,13 +922,10 @@
         email: 'lisa.anderson@email.com',
         username: 'lisaanderson',
         role: 'USER',
-        createdAt: '2024-01-25',
-        lastLogin: '2024-02-04',
-        isActive: true,
-        postsCount: 19,
-        platformsCount: 2,
-        avatarClass: avatarClasses[2],
-        avatarInitial: 'L'
+        createdAt: '2024-01-25T10:05:00',
+        lastActiveAt: '2024-02-04T15:05:00',
+        status: 'Active',
+        connectedAccountsCount: 2
       },
       {
         id: '10',
@@ -878,13 +933,10 @@
         email: 'chris.kumar@email.com',
         username: 'chriskumar',
         role: 'USER',
-        createdAt: '2023-11-30',
-        lastLogin: '2024-02-03',
-        isActive: true,
-        postsCount: 41,
-        platformsCount: 4,
-        avatarClass: avatarClasses[3],
-        avatarInitial: 'C'
+        createdAt: '2023-11-30T13:55:00',
+        lastActiveAt: '2024-02-03T12:15:00',
+        status: 'Active',
+        connectedAccountsCount: 4
       }
     ];
   }
@@ -893,7 +945,7 @@
   async function fetchUsersFromDatabase() {
     try {
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:8082/api/users/all', {
+      const response = await fetch(USER_ENDPOINTS.ALL, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -904,20 +956,7 @@
       if (response.ok) {
         const data = await response.json();
         // Transform backend data to match frontend structure
-        users = data.map((user, index) => ({
-          id: user.id,
-          name: user.name || user.userName || 'Unknown',
-          email: user.email,
-          username: user.userName || 'User',
-          role: user.role || 'USER',
-          createdAt: user.createdAt ? new Date(user.createdAt).toISOString().split('T')[0] : 'N/A',
-          lastLogin: user.lastLogin ? new Date(user.lastLogin).toISOString().split('T')[0] : 'Never',
-          isActive: user.isActive !== false,
-          postsCount: Math.floor(Math.random() * 50) + 1,
-          platformsCount: Math.floor(Math.random() * 5) + 1,
-          avatarClass: avatarClasses[index % avatarClasses.length],
-          avatarInitial: (user.name || user.userName || 'U').charAt(0).toUpperCase()
-        }));
+        users = data.map((user, index) => buildUserViewModel(user, index)).sort(sortUsers);
         renderUsers();
         updateStats();
       } else {
@@ -932,7 +971,7 @@
 
   // ===== LOAD DUMMY USERS AS FALLBACK =====
   function loadDummyUsers() {
-    users = getDummyUsers();
+    users = getDummyUsers().map((user, index) => buildUserViewModel(user, index)).sort(sortUsers);
     renderUsers();
     updateStats();
   }
@@ -970,9 +1009,10 @@
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
     
     const filtered = users.filter(u => {
-      return u.name.toLowerCase().includes(searchTerm) ||
-             u.email.toLowerCase().includes(searchTerm) ||
-             u.username.toLowerCase().includes(searchTerm);
+      const name = String(u.name || '').toLowerCase();
+      const email = String(u.email || '').toLowerCase();
+      const username = String(u.username || '').toLowerCase();
+      return name.includes(searchTerm) || email.includes(searchTerm) || username.includes(searchTerm);
     });
 
     const usersTableBody = document.getElementById('usersTableBody');
@@ -1014,13 +1054,13 @@
           </span>
         </td>
         <td class="px-6 py-4 text-center">
-          <div class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-orange-100 text-orange-600 font-bold text-sm">
-            ${u.postsCount}
-          </div>
+          <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold ${u.isActive ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600'}">
+            ${u.lastActiveLabel}
+          </span>
         </td>
         <td class="px-6 py-4 text-center">
-          <div class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-blue-100 text-blue-600 font-bold text-sm">
-            ${u.platformsCount}
+          <div class="inline-flex items-center justify-center w-10 h-10 rounded-lg font-bold text-sm ${u.connectedAccountsCount > 0 ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-500'}">
+            ${u.connectedAccountsCount}
           </div>
         </td>
         <td class="px-6 py-4 text-center">
@@ -1028,7 +1068,7 @@
             <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
             </svg>
-            ${new Date(u.createdAt).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: '2-digit'})}
+            ${u.joinedLabel}
           </div>
         </td>
         <td class="px-6 py-4 text-center">
@@ -1054,10 +1094,10 @@
     document.getElementById('modalUsername').textContent = user.username;
     document.getElementById('modalEmailDisplay').textContent = user.email;
     document.getElementById('modalUserRole').textContent = user.role;
-    document.getElementById('modalJoinedDate').textContent = new Date(user.createdAt).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'});
-    document.getElementById('modalLastActive').textContent = user.lastLogin;
-    document.getElementById('modalPostsCount').textContent = user.postsCount;
-    document.getElementById('modalPlatformsCount').textContent = user.platformsCount;
+    document.getElementById('modalJoinedDate').textContent = formatDateLong(user.createdAt);
+    document.getElementById('modalLastActive').textContent = user.lastActiveFull;
+    document.getElementById('modalConnectedAccounts').textContent = user.connectedAccountsCount;
+    document.getElementById('modalLastActiveSummary').textContent = user.lastActiveLabel;
 
     const statusElement = document.getElementById('modalUserStatus');
     if (user.isActive) {
@@ -1107,7 +1147,7 @@
 
     try {
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:8082/api/users/${currentUserModal.id}`, {
+      const response = await fetch(`${USER_API_BASE}/api/users/${currentUserModal.id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
