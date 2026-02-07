@@ -767,7 +767,8 @@
     : 'http://localhost:8082';
 
   const USER_ENDPOINTS = {
-    ALL: `${USER_API_BASE}/api/users/all`
+    ALL: `${USER_API_BASE}/api/users/all`,
+    DELETE: (email) => `${USER_API_BASE}/api/users/delete?email=${encodeURIComponent(email)}`
   };
 
   function parseDate(value) {
@@ -1164,36 +1165,47 @@
     const confirmBtn = document.getElementById('confirmDeleteBtn');
     const deleteBtnText = document.getElementById('deleteBtnText');
     const deleteSpinner = document.getElementById('deleteSpinner');
+    const targetEmail = currentUserModal.email ? String(currentUserModal.email).trim() : '';
 
     confirmBtn.disabled = true;
     deleteBtnText.textContent = 'Deleting';
     deleteSpinner.classList.remove('hidden');
 
     try {
+      if (!targetEmail) {
+        alert('Error: User email is missing. Unable to delete.');
+        return;
+      }
+
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`${USER_API_BASE}/api/users/${currentUserModal.id}`, {
+      const response = await fetch(USER_ENDPOINTS.DELETE(targetEmail), {
         method: 'DELETE',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${authToken}`
         }
       });
 
+      const rawText = await response.text();
+      let message = rawText;
+      try {
+        const parsed = rawText ? JSON.parse(rawText) : {};
+        message = parsed.message || parsed.error || rawText;
+      } catch (e) {
+        message = rawText;
+      }
+
       if (response.ok) {
-        alert('User deleted successfully!');
+        alert(message || 'User deleted successfully!');
         closeDeleteModal();
         closeUserModal();
         fetchUsersFromDatabase();
       } else {
-        const errorData = await response.json();
-        alert('Error: ' + (errorData.message || 'Failed to delete user'));
-        confirmBtn.disabled = false;
-        deleteBtnText.textContent = 'Delete Permanently';
-        deleteSpinner.classList.add('hidden');
+        alert('Error: ' + (message || 'Failed to delete user'));
       }
     } catch (error) {
       console.error('Error deleting user:', error);
       alert('Network error. Please try again.');
+    } finally {
       confirmBtn.disabled = false;
       deleteBtnText.textContent = 'Delete Permanently';
       deleteSpinner.classList.add('hidden');
